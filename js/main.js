@@ -210,10 +210,19 @@ function renderMiniCalendar() {
     
     monthYear.textContent = getMonthName(month) + ' ' + year;
     
-    const monthEvents = calendarEvents.filter(e => {
-        const d = parseDateKey(e.date);
-        return d.getMonth() === month && d.getFullYear() === year;
-    });
+    // Если выбран тег — показываем количество событий с этим тегом в месяце
+    let monthEvents;
+    if (currentFilter !== 'all') {
+        monthEvents = calendarEvents.filter(e => {
+            const d = parseDateKey(e.date);
+            return d.getMonth() === month && d.getFullYear() === year && e.tags && e.tags.includes(currentFilter);
+        });
+    } else {
+        monthEvents = calendarEvents.filter(e => {
+            const d = parseDateKey(e.date);
+            return d.getMonth() === month && d.getFullYear() === year;
+        });
+    }
     count.textContent = monthEvents.length + ' событий';
     
     const firstDay = new Date(year, month, 1);
@@ -237,7 +246,14 @@ function renderMiniCalendar() {
         const isCurrentMonth = date.getMonth() === month;
         const isToday = dateStr === todayStr;
         const isSelected = dateStr === selectedStr;
-        const hasEvents = calendarEvents.some(e => e.date === dateStr);
+        
+        // Проверяем наличие событий с учётом фильтра
+        let hasEvents;
+        if (currentFilter !== 'all') {
+            hasEvents = calendarEvents.some(e => e.date === dateStr && e.tags && e.tags.includes(currentFilter));
+        } else {
+            hasEvents = calendarEvents.some(e => e.date === dateStr);
+        }
         
         const dayBtn = document.createElement('button');
         dayBtn.className = 'day';
@@ -255,10 +271,15 @@ function renderMiniCalendar() {
         
         dayBtn.addEventListener('click', () => {
             selectedDate = date;
+            // Если выбран тег — сбрасываем его при клике на день
+            if (currentFilter !== 'all') {
+                currentFilter = 'all';
+                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                document.querySelector('.chip[data-filter="all"]')?.classList.add('active');
+            }
             renderMiniCalendar();
             renderTimeline();
             updateViewTitle();
-            // Очищаем поиск при смене дня
             const searchInput = document.getElementById('globalSearch');
             if (searchInput) searchInput.value = '';
         });
@@ -275,12 +296,19 @@ function changeMonth(delta) {
 function goToToday() {
     currentDate = new Date();
     selectedDate = new Date();
+    
+    // Сбрасываем фильтр тегов
+    if (currentFilter !== 'all') {
+        currentFilter = 'all';
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        document.querySelector('.chip[data-filter="all"]')?.classList.add('active');
+    }
+    
     renderMiniCalendar();
     renderTimeline();
     updateViewTitle();
-    updateWidgets(selectedDate);  // ← ОБНОВЛЯЕМ ВИДЖЕТЫ
+    updateWidgets(selectedDate);
     
-    // Очищаем поиск
     const searchInput = document.getElementById('globalSearch');
     if (searchInput) searchInput.value = '';
 }
@@ -290,6 +318,13 @@ function renderTimeline() {
     const container = document.getElementById('timeline');
     if (!container) return;
     
+    // Если выбран конкретный тег — показываем все события с ним
+    if (currentFilter !== 'all') {
+        renderTagView(container);
+        return;
+    }
+    
+    // Обычный режим (по дням)
     if (currentView === 'day') {
         renderDayView(container);
     } else if (currentView === 'week') {
@@ -299,9 +334,62 @@ function renderTimeline() {
     }
 }
 
+function renderTagView(container) {
+    const tag = tags[currentFilter];
+    if (!tag) {
+        currentFilter = 'all';
+        renderTimeline();
+        return;
+    }
+    
+    // Собираем все события с этим тегом
+    const events = calendarEvents.filter(e => e.tags && e.tags.includes(currentFilter));
+    
+    // Сортируем по дате
+    events.sort((a, b) => a.date.localeCompare(b.date) || (a.time || '00:00').localeCompare(b.time || '00:00'));
+    
+    // Обновляем заголовок
+    const title = document.getElementById('timelineTitle');
+    if (title) {
+        title.textContent = `${tag.name} (${events.length})`;
+    }
+    
+    if (events.length === 0) {
+        container.innerHTML = `
+            <div class="timeline-empty">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <p>Нет событий с тегом "${tag.name}"</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = events.map(event => {
+        const dateObj = parseDateKey(event.date);
+        const dateStr = dateObj.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        
+        return `
+            <div class="timeline-event" style="border-left-color: ${tag.color}; background: ${tag.color}11;" onclick="showEventDetails('${event.id}')">
+                <div class="timeline-event-time">${dateStr} ${event.time || ''}</div>
+                <div class="timeline-event-content">
+                    <div class="timeline-event-title">${escapeHtml(event.title)}</div>
+                    ${event.description ? `<div class="timeline-event-desc">${escapeHtml(event.description)}</div>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 function updateViewTitle() {
     const title = document.getElementById('timelineTitle');
     if (!title) return;
+    
+    // Если выбран тег — не обновляем заголовок (он обновляется в renderTagView)
+    if (currentFilter !== 'all') return;
     
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     if (currentView === 'day') {
@@ -328,6 +416,7 @@ function getWeekStart(date) {
 
 function renderDayView(container) {
     const dateStr = formatDateKey(selectedDate);
+    // Фильтруем события по дате
     const events = calendarEvents.filter(e => e.date === dateStr);
     
     updateViewTitle();
@@ -521,6 +610,23 @@ function showEventDetails(eventId) {
     }
     if (dateTimeEl) dateTimeEl.textContent = dateTime;
     if (descEl) descEl.textContent = event.description || 'Нет описания';
+
+    // Теги
+        const tagsContainer = document.getElementById('detailTags');
+        if (tagsContainer) {
+            const eventTags = getEventTags(event);
+            if (eventTags.length > 0) {
+                tagsContainer.innerHTML = eventTags.map(tag => `
+                    <span class="detail-tag" style="background: ${tag.color}22; color: ${tag.color}; border: 1px solid ${tag.color}44;">
+                        <span class="tag-dot" style="background: ${tag.color};"></span>
+                        ${tag.name}
+                    </span>
+                `).join('');
+                tagsContainer.style.display = 'flex';
+            } else {
+                tagsContainer.style.display = 'none';
+            }
+        }
 }
 
 function closeDetails() {
@@ -631,11 +737,13 @@ function editEvent(eventId) {
     setTimeout(() => document.getElementById('eventTitle').focus(), 100);
 }
 
+// В функции saveEvent добавьте поле tags
 function saveEvent() {
     const title = document.getElementById('eventTitle').value.trim();
     const date = document.getElementById('eventDate').value;
     const time = document.getElementById('eventTime').value;
     const description = document.getElementById('eventDescription').value.trim();
+    const tagsInput = document.getElementById('eventTags').value.trim();
     
     if (!title) {
         showToast('Введите название события');
@@ -647,6 +755,13 @@ function saveEvent() {
         return;
     }
     
+    // Обработка тегов
+    let tagIds = [];
+    if (tagsInput) {
+        const tagNames = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
+        tagIds = tagNames.map(name => getOrCreateTag(name)).filter(Boolean);
+    }
+    
     if (editingEventId) {
         const index = calendarEvents.findIndex(e => e.id === editingEventId);
         if (index !== -1) {
@@ -655,8 +770,8 @@ function saveEvent() {
                 title,
                 date,
                 time,
-                color: selectedEventColor,
-                description
+                description,
+                tags: tagIds
             };
         }
     } else {
@@ -665,8 +780,9 @@ function saveEvent() {
             title,
             date,
             time,
-            color: selectedEventColor,
-            description
+            description,
+            tags: tagIds,
+            color: tagIds.length > 0 ? tags[tagIds[0]]?.color : '#94a3b8'
         });
     }
     
@@ -674,6 +790,7 @@ function saveEvent() {
     closeAddEventModal();
     renderMiniCalendar();
     renderTimeline();
+    renderTags();
     showToast(editingEventId ? 'Событие обновлено' : 'Событие добавлено');
 }
 
@@ -769,7 +886,8 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('input', function(e) {
             const term = e.target.value.trim();
             if (term.length > 0) {
-                const results = calendarEvents.filter(e => 
+                const filtered = getFilteredEvents();
+                const results = filtered.filter(e => 
                     e.title.toLowerCase().includes(term.toLowerCase()) ||
                     (e.description && e.description.toLowerCase().includes(term.toLowerCase()))
                 );
@@ -972,13 +1090,68 @@ function toggleHamburgerMenu() {
     showToast('Меню в разработке');
 }
 
+function getFilteredEvents() {
+    let events = calendarEvents;
+    
+    if (currentFilter !== 'all') {
+        events = events.filter(e => e.tags && e.tags.includes(currentFilter));
+    }
+    
+    return events;
+}
+
+// Инициализация цветов в модалке
+function initTagColorPicker() {
+    const container = document.getElementById('editTagColors');
+    if (!container) return;
+    
+    const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f59e0b', '#22c55e', '#06b6d4', '#14b8a6', '#f472b6'];
+    
+    container.innerHTML = colors.map(color => `
+        <div class="color-option" data-color="${color}" style="background:${color};" onclick="selectEditTagColor('${color}', this)"></div>
+    `).join('');
+}
 
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. Тема
     loadTheme();
+    
+    // 2. Данные
     loadCalendarEvents();
+    loadTags();
+    
+    // 3. Рендеринг
     renderMiniCalendar();
     renderTimeline();
+    renderTags();
     updateViewTitle();
     updateViewIcon();
+    initTagColorPicker();
     
+    // 4. Поиск
+    const searchInput = document.getElementById('globalSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.trim();
+            if (term.length > 0) {
+                const results = calendarEvents.filter(e => 
+                    e.title.toLowerCase().includes(term.toLowerCase()) ||
+                    (e.description && e.description.toLowerCase().includes(term.toLowerCase()))
+                );
+                showSearchResults(results, term);
+            } else {
+                renderTimeline();
+                updateViewTitle();
+            }
+        });
+        
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                searchInput.blur();
+                renderTimeline();
+                updateViewTitle();
+            }
+        });
+    }
 });
