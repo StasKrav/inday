@@ -988,7 +988,7 @@ body {
   height: 32px;
   border-radius: 50%;
   cursor: pointer;
-  border: 3px solid transparent;
+  border: 1px solid transparent;
   transition: var(--transition);
   flex-shrink: 0;
 }
@@ -999,10 +999,8 @@ body {
 
 .color-option.active {
   border-color: var(--text);
-  transform: scale(1.15);
-  box-shadow:
-    0 0 0 2px var(--surface),
-    0 0 0 4px var(--text);
+  transform: scale(1.4);
+  border: 2px solid transparent;
 }
 
 [data-theme="dark"] .color-option.active {
