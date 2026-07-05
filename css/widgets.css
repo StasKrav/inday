@@ -2,212 +2,229 @@
    ПОГОДА - МИНИМАЛИСТИЧНЫЙ ВИДЖЕТ
    ============================================ */
 .weather-module {
-    margin-top: 16px;
-    padding-top: 44px;
-    /*border-top: 1px solid var(--border);*/
-    flex-shrink: 0;
-    transition: opacity 0.3s ease, max-height 0.3s ease;
+  margin-top: 16px;
+  padding-top: 44px;
+  /*border-top: 1px solid var(--border);*/
+  flex-shrink: 0;
+  transition:
+    opacity 0.3s ease,
+    max-height 0.3s ease;
 }
 
 .weather-module.disabled {
-    opacity: 0.4;
+  opacity: 0.4;
 }
 
 .weather-module.hidden {
-    display: none;
+  display: none;
 }
 
 .weather-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
 .weather-header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Переключатель */
 .weather-toggle {
-    width: 28px;
-    height: 28px;
-    border: none;
-    background: transparent;
-    border-radius: 50%;
-    cursor: pointer;
-    color: var(--text-secondary);
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 1;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
 }
 
 .weather-toggle:hover {
-    background: var(--primary-bg);
-    color: var(--primary);
-    opacity: 1;
+  background: var(--primary-bg);
+  color: var(--primary);
+  opacity: 1;
 }
 
 .weather-toggle.active {
-    color: var(--primary);
-    opacity: 1;
-    background: var(--primary-bg);
+  color: var(--primary);
+  opacity: 1;
+  background: var(--primary-bg);
 }
 
 .weather-toggle.active svg {
-    stroke: var(--primary);
+  stroke: var(--primary);
 }
 
 .weather-title {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .weather-settings-btn {
-    width: 24px;
-    height: 24px;
-    border: none;
-    background: transparent;
-    border-radius: 50%;
-    cursor: pointer;
-    color: var(--text-secondary);
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.3;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.3;
 }
 
 .weather-settings-btn:hover {
-    background: var(--primary-bg);
-    color: var(--primary);
-    opacity: 1;
+  background: var(--primary-bg);
+  color: var(--primary);
+  opacity: 1;
 }
 
 /* Настройки */
 .weather-settings {
-    margin-bottom: 10px;
-    padding: 10px 12px;
-    background: var(--background);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    animation: modalIn 0.2s ease;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: var(--background);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  animation: modalIn 0.2s ease;
 }
 
 .settings-row {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
 .city-input {
-    flex: 1;
-    padding: 6px 10px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 13px;
-    font-family: inherit;
-    outline: none;
-    transition: var(--transition);
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: var(--transition);
 }
 
 .city-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-bg);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-bg);
 }
 
 .city-save-btn {
-    padding: 6px 14px;
-    border: none;
-    border-radius: var(--radius);
-    background: var(--primary);
-    color: white;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    font-family: inherit;
-    white-space: nowrap;
+  padding: 6px 14px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  white-space: nowrap;
 }
 
 .city-save-btn:hover {
-    background: var(--primary-dark);
+  background: var(--primary-dark);
 }
 
 .city-hint {
-    font-size: 10px;
-    color: var(--text-secondary);
-    opacity: 0.4;
-    margin-top: 4px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  opacity: 0.4;
+  margin-top: 4px;
 }
 
 /* Контент погоды */
 .weather-content {
-    min-height: 40px;
+  min-height: 40px;
 }
 
 .weather-loading {
-    font-size: 12px;
-    color: var(--text-secondary);
-    opacity: 0.4;
+  font-size: 12px;
+  color: var(--text-secondary);
+  opacity: 0.4;
 }
 
 .weather-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .weather-icon {
-    font-size: 32px;
-    line-height: 1;
+  font-size: 32px;
+  line-height: 1;
 }
 
 .weather-temp {
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .weather-desc {
-    font-size: 12px;
-    color: var(--text-secondary);
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
 .weather-details {
-    display: flex;
-    gap: 12px;
-    margin-top: 2px;
-    font-size: 11px;
-    color: var(--text-secondary);
-    opacity: 0.5;
+  display: flex;
+  gap: 12px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.5;
 }
 
 .weather-error {
-    font-size: 12px;
-    color: var(--text-secondary);
-    opacity: 0.4;
+  font-size: 12px;
+  color: var(--text-secondary);
+  opacity: 0.4;
 }
 
 .weather-city {
-    font-size: 11px;
-    color: var(--text-secondary);
-    opacity: 0.3;
-    margin-left: 4px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.3;
+  margin-left: 4px;
 }
 
 [data-theme="dark"] .weather-settings {
-    background: var(--surface);
+  background: var(--surface);
 }
 
 [data-theme="dark"] .city-input {
-    background: var(--background);
+  background: var(--background);
+}
+
+/* Иконки погоды */
+.weather-icon svg {
+  width: 40px;
+  height: 40px;
+  display: block;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+  .weather-icon svg {
+    width: 32px;
+    height: 32px;
+  }
 }

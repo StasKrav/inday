@@ -1,0 +1,20 @@
+<svg width="32" height="36" viewBox="70 65 120 130" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="logoGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#3b82f6"/>
+                            <stop offset="50%" stop-color="#8b5cf6"/>
+                            <stop offset="100%" stop-color="#ec4899"/>
+                        </linearGradient>
+              </defs>       
+ 
+                <path fill="url(#logoGradDark)" stroke="none"
+                      d="M 80.62 87.99 L 80.62 173.70 L 181.58 173.70 L 181.58 87.99 L 172.85 87.99 
+                         A 15 15 0 0 1 157.86 103.12 A 15 15 0 0 1 142.86 88.12 A 15 15 0 0 1 142.87 87.99 L 119.87 87.99 
+                         A 15 15 0 0 1 104.88 103.12 A 15 15 0 0 1 89.88 88.12 A 15 15 0 0 1 89.90 87.99 L 80.62 87.99 Z"/>
+
+                <rect fill="url(#logoGradDark)" stroke="none" x="93.75" y="68.66" width="21.43" height="30" rx="11.15"/>
+                <rect fill="url(#logoGradDark)" stroke="none" x="146.94" y="68.66" width="21.43" height="30" rx="11.15"/>
+                <rect fill="none" stroke="white" stroke-width="none" x="93.75" y="68.66" width="21.43" height="30" rx="11.15"/>
+                <rect fill="none" stroke="white" stroke-width="none" x="146.94" y="68.66" width="21.43" height="30" rx="11.15"/>
+       
+            </svg>
