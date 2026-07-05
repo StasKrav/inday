@@ -1,0 +1,263 @@
+/* ============================================
+   DARK THEME — НЕОНОВАЯ НОЧЬ
+   ============================================ */
+[data-theme="dark"] {
+  --surface: #0b0a1a;
+  --background: #06040f;
+  --text: #e8e4f0;
+  --text-secondary: #9a8cb8;
+  --border: #2a2340;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.8);
+  --primary-bg: rgba(139, 92, 246, 0.15);
+
+  /* Основной акцент — фиолетово-неоновый */
+  --primary: #a78bfa;
+  --primary-light: #c4b5fd;
+  --primary-dark: #8b5cf6;
+
+  /* Дополнительные неоновые оттенки */
+  --neon-purple: #a78bfa;
+  --neon-pink: #f472b6;
+  --neon-cyan: #67e8f9;
+  --neon-blue: #60a5fa;
+
+  /* Градиенты для акцентов */
+  --accent-gradient: linear-gradient(135deg, #a78bfa, #f472b6);
+  --accent-gradient-subtle: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(244, 114, 182, 0.2));
+}
+
+/* Глобальный фон с лёгким градиентом */
+[data-theme="dark"] body {
+  background: linear-gradient(180deg, #06040f 0%, #0b0a1a 50%, #0f0a20 100%);
+}
+
+/* Карточки с лёгким свечением */
+[data-theme="dark"] .surface,
+[data-theme="dark"] .col-calendar,
+[data-theme="dark"] .col-timeline,
+[data-theme="dark"] .col-details {
+  background: var(--surface);
+  box-shadow: inset 0 0 80px rgba(139, 92, 246, 0.03);
+}
+
+/* Границы — с фиолетовым отливом */
+[data-theme="dark"] .border,
+[data-theme="dark"] .app-bar,
+[data-theme="dark"] .col-calendar,
+[data-theme="dark"] .col-timeline,
+[data-theme="dark"] .timeline-hour-content {
+  border-color: #2a2340;
+  border-color: rgba(139, 92, 246, 0.15);
+}
+
+/* Кнопки с неоновым эффектом */
+[data-theme="dark"] .btn-primary {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Выбранный день — неоновое свечение */
+[data-theme="dark"] .day.selected {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.5);
+  color: #fff !important;
+}
+
+[data-theme="dark"] .day.today {
+  border-color: #a78bfa;
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.2);
+}
+
+[data-theme="dark"] .day.today.selected {
+  box-shadow: 0 0 32px rgba(139, 92, 246, 0.6);
+  border-color: #c4b5fd;
+}
+
+/* Точки событий — неоновые */
+[data-theme="dark"] .day.has-event::after {
+  background: #a78bfa;
+  box-shadow: 0 0 6px rgba(167, 139, 250, 0.6);
+}
+
+[data-theme="dark"] .day.selected.has-event::after {
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+/* Таймлайн — текущий час с неоном */
+[data-theme="dark"] .timeline-hour.current .timeline-hour-content {
+  background: rgba(139, 92, 246, 0.1);
+  border-left-color: #a78bfa;
+  box-shadow: inset 0 0 30px rgba(139, 92, 246, 0.05);
+}
+
+[data-theme="dark"] .timeline-hour.current .timeline-hour-label {
+  color: #a78bfa;
+  text-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+}
+
+/* События в таймлайне — с акцентом */
+[data-theme="dark"] .timeline-hour .timeline-event {
+  background: rgba(255, 255, 255, 0.03);
+  border-left-color: #a78bfa;
+}
+
+[data-theme="dark"] .timeline-hour .timeline-event:hover {
+  background: rgba(139, 92, 246, 0.12);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.05);
+}
+
+/* Чипы фильтров */
+[data-theme="dark"] .chip.active {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.3);
+}
+
+[data-theme="dark"] .chip:hover {
+  border-color: #a78bfa;
+  color: #c4b5fd;
+}
+
+/* FAB — с неоновым свечением */
+[data-theme="dark"] .fab {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+}
+
+[data-theme="dark"] .fab:hover {
+  box-shadow: 0 0 50px rgba(139, 92, 246, 0.6);
+}
+
+/* Скроллбар в тёмной теме */
+[data-theme="dark"] .timeline-scroll::-webkit-scrollbar-thumb {
+  background: #2a2340;
+}
+
+[data-theme="dark"] .timeline-scroll::-webkit-scrollbar-thumb:hover {
+  background: #4a3a6a;
+}
+
+/* Модалки с фиолетовым отливом */
+[data-theme="dark"] .modal-content {
+  background: #0f0a20;
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .modal-content .field-input:focus,
+[data-theme="dark"] .modal-content .field-textarea:focus {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+/* Toast в тёмной теме */
+[data-theme="dark"] .toast {
+  background: #0f0a20;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .toast::before {
+  background: linear-gradient(180deg, #a78bfa, #f472b6);
+}
+
+/* Логотип в тёмной теме */
+[data-theme="dark"] .logo-text {
+  background: linear-gradient(135deg, #a78bfa, #f472b6, #67e8f9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Иконки с неоновым эффектом при ховере */
+[data-theme="dark"] .icon-button:hover,
+[data-theme="dark"] .nav-btn:hover,
+[data-theme="dark"] .nav-icon:hover {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.05);
+}
+
+/* Поиск */
+[data-theme="dark"] .search-input:focus {
+  border-color: #a78bfa;
+  background: #0f0a20;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1), 0 0 30px rgba(139, 92, 246, 0.03);
+}
+
+/* Погода */
+[data-theme="dark"] .weather-toggle:hover,
+[data-theme="dark"] .weather-settings-btn:hover {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+}
+
+[data-theme="dark"] .weather-toggle.active {
+  color: #a78bfa;
+  background: rgba(139, 92, 246, 0.15);
+}
+
+[data-theme="dark"] .city-input:focus {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+[data-theme="dark"] .day.today {
+  border-color: var(--primary-light);
+}
+
+[data-theme="dark"] .day.selected {
+  background: var(--primary);
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.4);
+}
+
+[data-theme="dark"] .day.today.selected {
+  box-shadow: 0 2px 16px rgba(99, 102, 241, 0.5);
+}
+
+[data-theme="dark"] .day.has-event::after {
+  background: var(--primary-light);
+}
+
+[data-theme="dark"] .day.selected.has-event::after {
+  background: white;
+}
+
+[data-theme="dark"] .btn-delete {
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+}
+
+[data-theme="dark"] .btn-delete:hover {
+  background: #ef4444;
+  color: white;
+}
+
+
+[data-theme="dark"] .color-option.active {
+  border-color: white;
+  transform: scale(1.4);
+  border: 2px solid transparent;
+}
+
+[data-theme="dark"] .timeline-hour.current .timeline-hour-content {
+    background: rgba(99, 102, 241, 0.12);
+}
+
+[data-theme="dark"] .timeline-hour .timeline-event {
+    background: var(--surface);
+}
+
+[data-theme="dark"] .timeline-hour .timeline-event:hover {
+    background: rgba(99, 102, 241, 0.15);
+}
+

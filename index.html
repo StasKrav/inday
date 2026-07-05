@@ -14,6 +14,7 @@
     />
     <title>Calendarus Pro</title>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dark.css" />
     <link rel="stylesheet" href="css/widgets.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -83,41 +84,65 @@
       </div>
 
       <div class="app-bar-right">
-        <button
-          class="icon-button"
-          onclick="toggleTheme()"
-          title="Переключить тему"
-        >
-          <svg
-            id="themeIcon"
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-        </button>
-        <button
-          class="btn-primary"
-          id="headerAddBtn"
-          onclick="showAddEventModal()"
-          style="display: none"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-          >
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          <span>Создать</span>
-        </button>
+          <!-- Кнопка темы -->
+          <button class="icon-button" onclick="toggleTheme()" title="Переключить тему">
+              <svg id="themeIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+          </button>
+
+          <!-- ГАМБУРГЕР-МЕНЮ -->
+          <div class="hamburger-wrapper">
+              <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleHamburgerMenu()">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="3" y1="6" x2="21" y2="6"/>
+                      <line x1="3" y1="12" x2="21" y2="12"/>
+                      <line x1="3" y1="18" x2="21" y2="18"/>
+                  </svg>
+              </button>
+              
+              <!-- Выпадающее меню -->
+              <div class="hamburger-menu" id="hamburgerMenu">
+                  <div class="hamburger-menu-item" onclick="exportCalendar(); closeHamburgerMenu();">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="7 10 12 15 17 10"/>
+                          <line x1="12" y1="15" x2="12" y2="3"/>
+                      </svg>
+                      <span>Сохранить (JSON)</span>
+                      <span class="hamburger-shortcut">⌘S</span>
+                  </div>
+                  <div class="hamburger-menu-item" onclick="document.getElementById('importFileInput').click(); closeHamburgerMenu();">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="17 8 12 3 7 8"/>
+                          <line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                      <span>Открыть (JSON)</span>
+                      <span class="hamburger-shortcut">⌘O</span>
+                  </div>
+                  <div class="hamburger-divider"></div>
+                  <div class="hamburger-menu-item" onclick="clearAllEvents(); closeHamburgerMenu();" style="color: #ef4444;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                      </svg>
+                      <span>Очистить все</span>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Скрытый input для импорта - можно оставить в любом месте -->
+          <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="handleImport(event)">
+      
+      
+          <!-- Кнопка создания события -->
+          <button class="btn-primary" id="headerAddBtn" onclick="showAddEventModal()" style="display: none">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M12 5v14M5 12h14"/>
+              </svg>
+              <span>Создать</span>
+          </button>
       </div>
     </header>
 

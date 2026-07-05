@@ -1000,18 +1000,24 @@ function editEventFromDetail() {
 }
 
 function showAddEventModal() {
-  editingEventId = null;
-  document.getElementById("eventTitle").value = "";
-  const dateStr = formatDateKey(selectedDate);
-  document.getElementById("eventDate").value = dateStr;
-  document.getElementById("eventTime").value = "";
-  document.getElementById("eventDescription").value = "";
-  selectedEventColor = "#6366f1";
-  document.querySelectorAll(".event-color-option").forEach((el) => {
-    el.classList.toggle("active", el.dataset.color === "#6366f1");
-  });
-  document.getElementById("addEventModal").classList.add("visible");
-  setTimeout(() => document.getElementById("eventTitle").focus(), 100);
+    editingEventId = null;
+    document.getElementById('eventTitle').value = '';
+    const dateStr = formatDateKey(selectedDate);
+    document.getElementById('eventDate').value = dateStr;
+    document.getElementById('eventTime').value = '';
+    document.getElementById('eventDescription').value = '';
+    document.getElementById('eventTags').value = '';
+    
+    // Сброс выбора цвета на дефолтный
+    selectedEventColor = '#6366f1';
+    
+    // Обновляем активный цвет в палитре
+    document.querySelectorAll('#addEventModal .color-option').forEach(el => {
+        el.classList.toggle('active', el.dataset.color === '#6366f1');
+    });
+    
+    document.getElementById('addEventModal').classList.add('visible');
+    setTimeout(() => document.getElementById('eventTitle').focus(), 100);
 }
 
 function closeAddEventModal() {
@@ -1035,92 +1041,127 @@ function closeAddEventModal() {
 }
 
 function selectEventColor(color, element) {
-  selectedEventColor = color;
-  document.querySelectorAll(".color-option").forEach((el) => {
-    // ← ПРАВИЛЬНО!
-    el.classList.remove("active");
-  });
-  element.classList.add("active");
+    selectedEventColor = color;
+    
+    // Находим все цветные кружочки в модалке
+    const colorOptions = document.querySelectorAll('#addEventModal .color-option');
+    colorOptions.forEach(el => {
+        el.classList.remove('active');
+    });
+    
+    // Активируем выбранный
+    if (element) {
+        element.classList.add('active');
+    } else {
+        // Если элемент не передан - ищем по цвету
+        colorOptions.forEach(el => {
+            if (el.dataset.color === color) {
+                el.classList.add('active');
+            }
+        });
+    }
 }
 
 function editEvent(eventId) {
-  const id = typeof eventId === "string" ? parseFloat(eventId) : eventId;
-  const event = calendarEvents.find((e) => e.id === id);
-  if (!event) return;
+    const id = typeof eventId === 'string' ? parseFloat(eventId) : eventId;
+    const event = calendarEvents.find(e => e.id === id);
+    if (!event) {
+        showToast('❌ Событие не найдено');
+        return;
+    }
 
-  editingEventId = event.id;
-  document.getElementById("eventTitle").value = event.title;
-  document.getElementById("eventDate").value = event.date;
-  document.getElementById("eventTime").value = event.time || "";
-  document.getElementById("eventDescription").value = event.description || "";
-  selectedEventColor = event.color;
+    editingEventId = event.id;
+    document.getElementById('eventTitle').value = event.title || '';
+    document.getElementById('eventDate').value = event.date || '';
+    document.getElementById('eventTime').value = event.time || '';
+    document.getElementById('eventDescription').value = event.description || '';
+    
+    // Показываем теги
+    const eventTags = getEventTags(event);
+    document.getElementById('eventTags').value = eventTags.map(t => t.name).join(', ');
+    
+    // Устанавливаем цвет события
+    selectedEventColor = event.color || '#6366f1';
+    
+    // Обновляем активный цвет в палитре
+    document.querySelectorAll('#addEventModal .color-option').forEach(el => {
+        el.classList.toggle('active', el.dataset.color === selectedEventColor);
+    });
 
-  document.querySelectorAll(".event-color-option").forEach((el) => {
-    el.classList.toggle("active", el.dataset.color === event.color);
-  });
-
-  document.getElementById("addEventModal").classList.add("visible");
-  setTimeout(() => document.getElementById("eventTitle").focus(), 100);
+    document.getElementById('addEventModal').classList.add('visible');
+    setTimeout(() => document.getElementById('eventTitle').focus(), 100);
 }
 
 // В функции saveEvent добавьте поле tags
 function saveEvent() {
-  const title = document.getElementById("eventTitle").value.trim();
-  const date = document.getElementById("eventDate").value;
-  const time = document.getElementById("eventTime").value;
-  const description = document.getElementById("eventDescription").value.trim();
-  const tagsInput = document.getElementById("eventTags").value.trim();
+    const title = document.getElementById('eventTitle').value.trim();
+    const date = document.getElementById('eventDate').value;
+    const time = document.getElementById('eventTime').value;
+    const description = document.getElementById('eventDescription').value.trim();
+    const tagsInput = document.getElementById('eventTags').value.trim();
 
-  if (!title) {
-    showToast("Введите название события");
-    return;
-  }
-
-  if (!date) {
-    showToast("Выберите дату");
-    return;
-  }
-
-  // Обработка тегов
-  let tagIds = [];
-  if (tagsInput) {
-    const tagNames = tagsInput
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-    tagIds = tagNames.map((name) => getOrCreateTag(name)).filter(Boolean);
-  }
-
-  if (editingEventId) {
-    const index = calendarEvents.findIndex((e) => e.id === editingEventId);
-    if (index !== -1) {
-      calendarEvents[index] = {
-        ...calendarEvents[index],
-        title,
-        date,
-        time,
-        description,
-        tags: tagIds,
-      };
+    if (!title) {
+        showToast('❌ Введите название события');
+        return;
     }
-  } else {
-    calendarEvents.push({
-      id: Date.now() + Math.random(),
-      title,
-      date,
-      time,
-      description,
-      tags: tagIds,
-      color: tagIds.length > 0 ? tags[tagIds[0]]?.color : "#94a3b8",
-    });
-  }
 
-  saveCalendarEvents();
-  closeAddEventModal();
-  renderMiniCalendar();
-  renderTimeline();
-  renderTags();
-  showToast(editingEventId ? "Событие обновлено" : "Событие добавлено");
+    if (!date) {
+        showToast('❌ Выберите дату');
+        return;
+    }
+
+    // Используем выбранный цвет
+    let color = selectedEventColor || '#6366f1';
+
+    // Обработка тегов
+    let tagIds = [];
+    if (tagsInput) {
+        const tagNames = tagsInput
+            .split(',')
+            .map(t => t.trim())
+            .filter(Boolean);
+        tagIds = tagNames.map(name => getOrCreateTag(name)).filter(Boolean);
+        
+        // Если есть теги - берём цвет первого тега
+        if (tagIds.length > 0 && tags[tagIds[0]]) {
+            color = tags[tagIds[0]].color;
+        }
+    }
+
+    if (editingEventId) {
+        // Редактирование существующего события
+        const index = calendarEvents.findIndex(e => e.id === editingEventId);
+        if (index !== -1) {
+            calendarEvents[index] = {
+                ...calendarEvents[index],
+                title,
+                date,
+                time,
+                description,
+                tags: tagIds,
+                color: color
+            };
+            showToast('✅ Событие обновлено');
+        }
+    } else {
+        // Создание нового события
+        calendarEvents.push({
+            id: Date.now() + Math.random(),
+            title,
+            date,
+            time,
+            description,
+            tags: tagIds,
+            color: color
+        });
+        showToast('✅ Событие добавлено');
+    }
+
+    saveCalendarEvents();
+    closeAddEventModal();
+    renderMiniCalendar();
+    renderTimeline();
+    renderTags();
 }
 
 function deleteEvent(eventId) {
@@ -1348,82 +1389,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-function exportCalendar() {
-  if (calendarEvents.length === 0) {
-    showToast("Нет событий для экспорта");
-    return;
-  }
-
-  const json = JSON.stringify(calendarEvents, null, 2);
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `calendar_events_${new Date().toISOString().slice(0, 10)}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast("Календарь экспортирован");
-}
-
-function importCalendar() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = ".json";
-  input.onchange = function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      try {
-        const data = JSON.parse(event.target.result);
-        if (!Array.isArray(data)) {
-          showToast("❌ Неверный формат файла");
-          return;
-        }
-        calendarEvents = data;
-        calendarEvents.forEach((event) => {
-          if (!event.id) event.id = Date.now() + Math.random();
-        });
-        saveCalendarEvents();
-        renderMiniCalendar();
-        renderTimeline();
-        showToast(`Импортировано ${calendarEvents.length} событий`);
-      } catch (err) {
-        showToast("❌ Ошибка импорта");
-      }
-    };
-    reader.readAsText(file);
-  };
-  input.click();
-}
-
-function clearAllEvents() {
-  if (calendarEvents.length === 0) {
-    showToast("Календарь уже пуст");
-    return;
-  }
-
-  showConfirmDialog(
-    "Очистить календарь?",
-    `Будет удалено ${calendarEvents.length} событий без возможности восстановления`,
-    "Очистить",
-    () => {
-      calendarEvents = [];
-      saveCalendarEvents();
-      renderMiniCalendar();
-      renderTimeline();
-      closeDetails();
-      showToast("Календарь очищен");
-    },
-  );
-}
-
-function toggleHamburgerMenu() {
-  // Можно добавить мобильное меню при необходимости
-  showToast("Меню в разработке");
-}
 
 // Инициализация цветов в модалке
 function initTagColorPicker() {
@@ -1496,3 +1461,186 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+
+// ============================================
+// ГАМБУРГЕР-МЕНЮ
+// ============================================
+
+function toggleHamburgerMenu() {
+    const menu = document.getElementById('hamburgerMenu');
+    if (!menu) {
+        console.error('❌ Меню не найдено!');
+        return;
+    }
+    
+    menu.classList.toggle('visible');
+    
+    // Если меню открыто - добавляем обработчик для закрытия по клику вне
+    if (menu.classList.contains('visible')) {
+        setTimeout(() => {
+            document.addEventListener('click', closeHamburgerMenuOutside);
+        }, 10);
+    } else {
+        document.removeEventListener('click', closeHamburgerMenuOutside);
+    }
+}
+
+function closeHamburgerMenu() {
+    const menu = document.getElementById('hamburgerMenu');
+    if (menu) {
+        menu.classList.remove('visible');
+    }
+    document.removeEventListener('click', closeHamburgerMenuOutside);
+}
+
+function closeHamburgerMenuOutside(e) {
+    const menu = document.getElementById('hamburgerMenu');
+    const btn = document.getElementById('hamburgerBtn');
+    
+    if (!menu || !btn) return;
+    
+    // Если клик не по меню и не по кнопке - закрываем
+    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+        closeHamburgerMenu();
+    }
+}
+
+// ЭКСПОРТ В ГЛОБАЛЬНУЮ ОБЛАСТЬ
+window.toggleHamburgerMenu = toggleHamburgerMenu;
+window.closeHamburgerMenu = closeHamburgerMenu;
+
+// ============================================
+// ИМПОРТ / ЭКСПОРТ
+// ============================================
+
+function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        console.log('❌ Файл не выбран');
+        return;
+    }
+    
+    console.log('📂 Импорт файла:', file.name);
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            console.log('📄 Данные из файла:', data);
+            
+            // Проверяем формат
+            if (data.events && Array.isArray(data.events)) {
+                // Новый формат с тегами
+                calendarEvents = data.events;
+                if (data.tags) {
+                    tags = data.tags;
+                    saveTags();
+                }
+                console.log('✅ Импортировано в новом формате');
+            } else if (Array.isArray(data)) {
+                // Старый формат (только события)
+                calendarEvents = data;
+                console.log('✅ Импортировано в старом формате');
+            } else {
+                showToast('❌ Неверный формат файла');
+                console.error('❌ Неверный формат:', data);
+                return;
+            }
+            
+            // Восстанавливаем ID
+            calendarEvents.forEach(event => {
+                if (!event.id) event.id = Date.now() + Math.random();
+                if (!event.tags) event.tags = [];
+            });
+            
+            saveCalendarEvents();
+            renderMiniCalendar();
+            renderTimeline();
+            renderTags();
+            updateViewTitle();
+            showToast(`✅ Импортировано ${calendarEvents.length} событий`);
+            console.log(`✅ Импортировано ${calendarEvents.length} событий`);
+            
+        } catch (err) {
+            console.error('❌ Ошибка импорта:', err);
+            showToast('❌ Ошибка при чтении файла');
+        }
+    };
+    
+    reader.onerror = function() {
+        showToast('❌ Ошибка чтения файла');
+        console.error('❌ Ошибка чтения файла');
+    };
+    
+    reader.readAsText(file);
+    
+    // Сбрасываем input
+    event.target.value = '';
+}
+
+// ЭКСПОРТ
+window.handleImport = handleImport;
+
+// ============================================
+// ЭКСПОРТ (СОХРАНИТЬ)
+// ============================================
+
+function exportCalendar() {
+    if (calendarEvents.length === 0) {
+        showToast('❌ Нет событий для экспорта');
+        return;
+    }
+
+    const data = {
+        events: calendarEvents,
+        tags: tags,
+        exportedAt: new Date().toISOString(),
+        version: '1.0'
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `calendar_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`✅ Экспортировано ${calendarEvents.length} событий`);
+    console.log(`✅ Экспортировано ${calendarEvents.length} событий`);
+}
+
+window.exportCalendar = exportCalendar;
+
+// ============================================
+// ОЧИСТИТЬ ВСЕ
+// ============================================
+
+function clearAllEvents() {
+    if (calendarEvents.length === 0) {
+        showToast('📭 Календарь уже пуст');
+        return;
+    }
+
+    showConfirmDialog(
+        'Очистить календарь?',
+        `Будет удалено ${calendarEvents.length} событий без возможности восстановления`,
+        'Очистить',
+        () => {
+            calendarEvents = [];
+            saveCalendarEvents();
+            renderMiniCalendar();
+            renderTimeline();
+            renderTags();
+            updateViewTitle();
+            closeDetails();
+            showToast('🗑️ Календарь очищен');
+            console.log('🗑️ Календарь очищен');
+        }
+    );
+}
+
+window.clearAllEvents = clearAllEvents;

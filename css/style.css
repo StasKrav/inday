@@ -23,17 +23,6 @@
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-[data-theme="dark"] {
-  --surface: #0f172a;
-  --background: #020617;
-  --text: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --border: #1e293b;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
-  --primary-bg: rgba(99, 102, 241, 0.15);
-}
 
 * {
   margin: 0;
@@ -387,29 +376,6 @@ body {
   background: white;
 }
 
-/* ============================================
-   DARK THEME
-   ============================================ */
-[data-theme="dark"] .day.today {
-  border-color: var(--primary-light);
-}
-
-[data-theme="dark"] .day.selected {
-  background: var(--primary);
-  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.4);
-}
-
-[data-theme="dark"] .day.today.selected {
-  box-shadow: 0 2px 16px rgba(99, 102, 241, 0.5);
-}
-
-[data-theme="dark"] .day.has-event::after {
-  background: var(--primary-light);
-}
-
-[data-theme="dark"] .day.selected.has-event::after {
-  background: white;
-}
 
 /* СТАТИСТИКА ВНИЗУ */
 .calendar-stats {
@@ -813,15 +779,7 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-[data-theme="dark"] .btn-delete {
-  background: rgba(248, 113, 113, 0.12);
-  color: #f87171;
-}
 
-[data-theme="dark"] .btn-delete:hover {
-  background: #ef4444;
-  color: white;
-}
 
 /* ============================================
    MODALS
@@ -1001,13 +959,6 @@ body {
   border-color: var(--text);
   transform: scale(1.4);
   border: 2px solid transparent;
-}
-
-[data-theme="dark"] .color-option.active {
-  border-color: white;
-  box-shadow:
-    0 0 0 2px var(--surface),
-    0 0 0 4px rgba(255, 255, 255, 0.3);
 }
 
 .modal-footer {
@@ -1554,18 +1505,135 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Тёмная тема */
-[data-theme="dark"] .timeline-hour.current .timeline-hour-content {
-    background: rgba(99, 102, 241, 0.12);
+/* ============================================
+   ГАМБУРГЕР-МЕНЮ (ПРАВАЯ СТОРОНА)
+   ============================================ */
+.hamburger-wrapper {
+    position: relative;
+    flex-shrink: 0;
 }
 
-[data-theme="dark"] .timeline-hour .timeline-event {
+.hamburger-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hamburger-btn:hover {
+    background: var(--primary-bg);
+    color: var(--primary);
+}
+
+.hamburger-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;  /* ← МЕНЯЕМ С left НА right */
+    min-width: 220px;
     background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 6px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(0.96);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 300;
 }
 
-[data-theme="dark"] .timeline-hour .timeline-event:hover {
+.hamburger-menu.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.hamburger-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.hamburger-menu-item:hover {
+    background: var(--primary-bg);
+}
+
+.hamburger-menu-item svg {
+    flex-shrink: 0;
+    color: var(--text-secondary);
+}
+
+.hamburger-shortcut {
+    margin-left: auto;
+    padding-left: 16px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: 0.5;
+    font-weight: 400;
+}
+
+.hamburger-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 12px;
+}
+
+/* Анимация открытия */
+@keyframes menuSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.hamburger-menu.visible {
+    animation: menuSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Тёмная тема */
+[data-theme="dark"] .hamburger-menu {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .hamburger-menu-item:hover {
     background: rgba(99, 102, 241, 0.15);
 }
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .hamburger-menu {
+        min-width: 200px;
+        right: -8px;
+    }
+    
+    .hamburger-shortcut {
+        display: none; /* Скрываем подсказки на мобилках */
+    }
+}
+
+
+
+
+
 
 /* Адаптив */
 @media (max-width: 768px) {
