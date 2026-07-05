@@ -1431,3 +1431,161 @@ body {
 .nav-icon.active svg {
   stroke: var(--primary);
 }
+
+/* ============================================
+   ТАЙМЛАЙН С ЧАСОВОЙ СЕТКОЙ
+   ============================================ */
+
+.timeline-hour {
+    display: flex;
+    gap: 12px;
+    padding: 4px 0;
+    min-height: 60px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s ease;
+}
+
+.timeline-hour:last-child {
+    border-bottom: none;
+}
+
+.timeline-hour-label {
+    min-width: 60px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding-top: 6px;
+    text-align: right;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.timeline-hour-content {
+    flex: 1;
+    min-height: 50px;
+    padding-left: 12px;
+    position: relative;
+    border-left: 2px solid var(--border);
+}
+
+/* Пустой час */
+.timeline-hour-empty {
+    height: 100%;
+    min-height: 40px;
+    background: white;
+
+    opacity: 0.2;
+    border-radius: 4px;
+}
+
+/* Текущий час (подсветка) */
+.timeline-hour.current .timeline-hour-label {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.timeline-hour.current .timeline-hour-content {
+    border-left-color: var(--primary);
+    background: var(--primary-bg);
+    border-radius: 0 8px 8px 0;
+}
+
+.timeline-hour.current .timeline-hour-content::before {
+    content: '●';
+    position: absolute;
+    left: -8px;
+    top: 2px;
+    color: var(--primary);
+    font-size: 12px;
+}
+
+/* Прошлые часы */
+.timeline-hour.past .timeline-hour-label {
+    opacity: 0.5;
+}
+
+.timeline-hour.past .timeline-hour-content {
+    opacity: 0.6;
+}
+
+/* Будущие часы */
+.timeline-hour.future .timeline-hour-label {
+    opacity: 0.7;
+}
+
+/* События внутри часов */
+.timeline-hour .timeline-event {
+    margin: 0 0 4px 0;
+    padding: 6px 12px;
+    border-radius: 0 8px 8px 0;
+    border-left-width: 3px;
+    background: var(--background);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    min-height: 36px;
+}
+
+.timeline-hour .timeline-event:hover {
+    transform: translateX(4px);
+    background: var(--primary-bg);
+}
+
+.timeline-hour .timeline-event .timeline-event-time {
+    min-width: 50px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding-top: 1px;
+}
+
+.timeline-hour .timeline-event .timeline-event-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.timeline-hour .timeline-event .timeline-event-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Тёмная тема */
+[data-theme="dark"] .timeline-hour.current .timeline-hour-content {
+    background: rgba(99, 102, 241, 0.12);
+}
+
+[data-theme="dark"] .timeline-hour .timeline-event {
+    background: var(--surface);
+}
+
+[data-theme="dark"] .timeline-hour .timeline-event:hover {
+    background: rgba(99, 102, 241, 0.15);
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .timeline-hour {
+        padding: 2px 0;
+        min-height: 50px;
+    }
+    
+    .timeline-hour-label {
+        min-width: 44px;
+        font-size: 11px;
+    }
+    
+    .timeline-hour .timeline-event {
+        padding: 4px 10px;
+        min-height: 30px;
+    }
+    
+    .timeline-hour .timeline-event .timeline-event-time {
+        min-width: 40px;
+        font-size: 10px;
+    }
+}

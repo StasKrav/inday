@@ -131,26 +131,24 @@ function getTagCount(tagId) {
 }
 
 function applyTagFilter(filter) {
-  currentFilter = filter;
-
-  // Обновляем активный класс
-  document
-    .querySelectorAll(".chip")
-    .forEach((c) => c.classList.remove("active"));
-  document
-    .querySelector(`.chip[data-filter="${filter}"]`)
-    ?.classList.add("active");
-
-  // Показываем события
-  renderTimeline();
-  renderMiniCalendar();
-
-  // Показываем название фильтра
-  let filterName = "Все события";
-  if (filter !== "all" && tags[filter]) {
-    const count = getTagCount(filter);
-    filterName = `🏷️ ${tags[filter].name} (${count})`;
-  }
+    currentFilter = filter;
+    
+    // Обновляем активный класс
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    document.querySelector(`.chip[data-filter="${filter}"]`)?.classList.add('active');
+    
+    renderTimeline();
+    renderMiniCalendar();
+    
+    // Показываем название фильтра
+    let filterName = 'Все события';
+    if (filter === 'all_global') {
+        filterName = '🌍 Все события (за всё время)';
+    } else if (filter !== 'all' && tags[filter]) {
+        const count = getTagCount(filter);
+        filterName = `🏷️ ${tags[filter].name} (${count})`;
+    }
+    showToast(`🔍 ${filterName}`);
 }
 
 let editingTagId = null;
