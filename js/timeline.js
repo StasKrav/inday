@@ -1,6 +1,7 @@
+// timeline.js - С ПОИСКОМ
+
 // ============================================
-// ФУНКЦИИ РЕНДЕРИНГА ДЛЯ ТАЙМЛАЙНА
-// (Добавить в main.js)
+// РЕНДЕРИНГ СОБЫТИЙ
 // ============================================
 
 function renderDayEvents(events) {
@@ -151,29 +152,33 @@ function renderAllEvents(events) {
     }).join("");
 }
 
-function getEmptyMessage() {
-    if (window.state && state.searchQuery) {
-        return `Ничего не найдено по запросу "${state.searchQuery}"`;
+// ============================================
+// ПОИСК
+// ============================================
+
+function showSearchResults(results, term) {
+    const container = document.getElementById("timeline");
+    const title = document.getElementById("timelineTitle");
+    if (!container || !title) return;
+
+    title.textContent = `🔍 Результаты поиска (${results.length})`;
+
+    if (results.length === 0) {
+        container.innerHTML = `
+            <div class="timeline-empty">
+                <p>Ничего не найдено по запросу "${term}"</p>
+            </div>
+        `;
+        return;
     }
-    
-    if (window.state && state.selectedTag) {
-        const tagName = tags[state.selectedTag]?.name || '';
-        if (state.showAll) {
-            return `Нет событий с тегом "${tagName}"`;
-        } else {
-            const names = { day: 'дне', week: 'неделе', month: 'месяце' };
-            const viewName = names[currentView] || 'дне';
-            return `Нет событий с тегом "${tagName}" в ${viewName}`;
-        }
-    }
-    
-    if (window.state && state.showAll) {
-        return 'Нет событий';
-    }
-    
-    const names = { day: 'дне', week: 'неделе', month: 'месяце' };
-    return `Нет событий в ${names[currentView] || 'дне'}`;
+
+    results.sort((a, b) => a.date.localeCompare(b.date));
+    container.innerHTML = renderAllEvents(results);
 }
+
+// ============================================
+// ГЛАВНАЯ ФУНКЦИЯ РЕНДЕРИНГА
+// ============================================
 
 function renderTimeline() {
     const container = document.getElementById("timeline");
@@ -197,13 +202,6 @@ function renderTimeline() {
         return;
     }
 
-    // Если включен showAll - показываем все события
-    if (window.state && state.showAll) {
-        container.innerHTML = renderAllEvents(events);
-        return;
-    }
-
-    // Стандартный рендеринг
     if (currentView === "day") {
         container.innerHTML = renderDayEvents(events);
     } else if (currentView === "week") {
@@ -213,80 +211,9 @@ function renderTimeline() {
     }
 }
 
-function renderTagView(container) {
-    const state = window.state || { selectedTag: null };
-    if (!state.selectedTag) {
-        renderTimeline();
-        return;
-    }
-    
-    const tag = tags[state.selectedTag];
-    if (!tag) {
-        state.selectedTag = null;
-        if (typeof window.applyFilters === 'function') {
-            window.applyFilters();
-        }
-        return;
-    }
-
-    // Собираем все события с этим тегом
-    const events = calendarEvents.filter(
-        (e) => e.tags && e.tags.includes(state.selectedTag)
-    );
-
-    // Сортируем по дате
-    events.sort(
-        (a, b) =>
-            a.date.localeCompare(b.date) ||
-            (a.time || "00:00").localeCompare(b.time || "00:00")
-    );
-
-    // Обновляем заголовок
-    const title = document.getElementById("timelineTitle");
-    if (title) {
-        const count = events.length;
-        if (state.showAll) {
-            title.textContent = `Все события с тегом "${tag.name}" (${count})`;
-        } else {
-            title.textContent = `${tag.name} (${count})`;
-        }
-    }
-
-    if (events.length === 0) {
-        container.innerHTML = `
-            <div class="timeline-empty">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-                <p>Нет событий с тегом "${tag.name}"</p>
-            </div>
-        `;
-        return;
-    }
-
-    container.innerHTML = events
-        .map((event) => {
-            const dateObj = parseDateKey(event.date);
-            const dateStr = dateObj.toLocaleDateString("ru-RU", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-            });
-
-            return `
-                <div class="timeline-event" style="border-left-color: ${tag.color}; background: ${tag.color}11;" onclick="showEventDetails('${event.id}')">
-                    <div class="timeline-event-time">${dateStr} ${event.time || ""}</div>
-                    <div class="timeline-event-content">
-                        <div class="timeline-event-title">${escapeHtml(event.title)}</div>
-                        ${event.description ? `<div class="timeline-event-desc">${escapeHtml(event.description)}</div>` : ""}
-                    </div>
-                </div>
-            `;
-        })
-        .join("");
-}
+// ============================================
+// ОБНОВЛЕНИЕ ЗАГОЛОВКА
+// ============================================
 
 function updateViewTitle() {
     const title = document.getElementById('timelineTitle');
@@ -301,26 +228,12 @@ function updateViewTitle() {
     
     // Режим "показать все"
     if (state.showAll) {
-        if (state.selectedTag) {
-            const tagName = tags[state.selectedTag]?.name || '';
-            const count = getFilteredEvents().length;
-            title.textContent = `Все события с тегом "${tagName}" (${count})`;
-        } else {
-            const count = getFilteredEvents().length;
-            title.textContent = `Все события (${count})`;
-        }
-        return;
-    }
-    
-    // Фильтр по тегу (без showAll)
-    if (state.selectedTag) {
-        const tagName = tags[state.selectedTag]?.name || '';
         const count = getFilteredEvents().length;
-        title.textContent = `${tagName} (${count})`;
+        title.textContent = `Все события (${count})`;
         return;
     }
     
-    // Стандартный режим (ничего не выбрано)
+    // Стандартный режим
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     if (currentView === 'day') {
         title.textContent = selectedDate.toLocaleDateString('ru-RU', options);
@@ -333,3 +246,15 @@ function updateViewTitle() {
         title.textContent = getMonthName(selectedDate.getMonth()) + ' ' + selectedDate.getFullYear();
     }
 }
+
+// ============================================
+// ЭКСПОРТ
+// ============================================
+
+window.renderTimeline = renderTimeline;
+window.updateViewTitle = updateViewTitle;
+window.showSearchResults = showSearchResults;
+window.renderDayEvents = renderDayEvents;
+window.renderWeekEvents = renderWeekEvents;
+window.renderMonthEvents = renderMonthEvents;
+window.renderAllEvents = renderAllEvents;

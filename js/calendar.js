@@ -121,7 +121,6 @@ function goToToday() {
   renderMiniCalendar();
   renderTimeline();
   updateViewTitle();
-  updateWidgets(selectedDate);
 
   const searchInput = document.getElementById("globalSearch");
   if (searchInput) searchInput.value = "";
