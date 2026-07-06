@@ -107,3 +107,20 @@ function initTagColorPicker() {
 
 window.getWeekStart = getWeekStart;
 window.initTagColorPicker = initTagColorPicker;
+
+// ============================================
+// ПРОВЕРКА ПОДДЕРЖКИ API
+// ============================================
+
+function isFileSystemAccessSupported() {
+    return 'showDirectoryPicker' in window && 'showOpenFilePicker' in window;
+}
+
+// Показываем уведомление при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    if (isFileSystemAccessSupported()) {
+        console.log('✅ File System Access API поддерживается');
+    } else {
+        console.log('ℹ️ File System Access API не поддерживается, используется стандартное скачивание');
+    }
+});

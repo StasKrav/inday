@@ -1,5 +1,5 @@
 // ============================================
-// TIMELINE.JS - ПОЛНАЯ ВЕРСИЯ С МУЛЬТИ-ВЫБОРОМ
+// timeline.js — ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ============================================
 
 // ============================================
@@ -16,7 +16,7 @@ function renderDayEvents(events) {
     return events.map(event => `
         <div class="timeline-event" id="event-${event.id}" 
              style="border-left-color: ${event.color}" 
-             onclick="handleEventClick(${event.id}, this)">
+             onclick="handleEventClick('${event.id}', this)">
             <div class="event-checkbox"></div>
             <div class="timeline-event-time">${event.time || "Весь день"}</div>
             <div class="timeline-event-content">
@@ -42,7 +42,7 @@ function renderWeekEvents(events) {
 
     return sortedDates.map(date => {
         const dateObj = parseDateKey(date);
-        const dayLabel = formatDateDisplay(dateObj, {
+        const dayLabel = dateObj.toLocaleDateString("ru-RU", {
             weekday: "short",
             day: "numeric"
         });
@@ -59,7 +59,7 @@ function renderWeekEvents(events) {
                 ${dayEvents.map(event => `
                     <div class="timeline-event" id="event-${event.id}" 
                          style="border-left-color: ${event.color}" 
-                         onclick="handleEventClick(${event.id}, this)">
+                         onclick="handleEventClick('${event.id}', this)">
                         <div class="event-checkbox"></div>
                         <div class="timeline-event-time">${event.time || "Весь день"}</div>
                         <div class="timeline-event-content">
@@ -88,7 +88,7 @@ function renderMonthEvents(events) {
 
     return sortedDates.map(date => {
         const dateObj = parseDateKey(date);
-        const dayLabel = formatDateDisplay(dateObj, {
+        const dayLabel = dateObj.toLocaleDateString("ru-RU", {
             day: "numeric",
             month: "short"
         });
@@ -105,7 +105,7 @@ function renderMonthEvents(events) {
                 ${dayEvents.map(event => `
                     <div class="timeline-event" id="event-${event.id}" 
                          style="border-left-color: ${event.color}" 
-                         onclick="handleEventClick(${event.id}, this)">
+                         onclick="handleEventClick('${event.id}', this)">
                         <div class="event-checkbox"></div>
                         <div class="timeline-event-time">${event.time || "Весь день"}</div>
                         <div class="timeline-event-content">
@@ -134,7 +134,7 @@ function renderAllEvents(events) {
 
     return sortedDates.map(date => {
         const dateObj = parseDateKey(date);
-        const dateStr = formatDateDisplay(dateObj, {
+        const dateStr = dateObj.toLocaleDateString("ru-RU", {
             day: "numeric",
             month: "long",
             year: "numeric"
@@ -152,7 +152,7 @@ function renderAllEvents(events) {
                 ${dayEvents.map(event => `
                     <div class="timeline-event" id="event-${event.id}" 
                          style="border-left-color: ${event.color}" 
-                         onclick="handleEventClick(${event.id}, this)">
+                         onclick="handleEventClick('${event.id}', this)">
                         <div class="event-checkbox"></div>
                         <div class="timeline-event-time">${event.time || "Весь день"}</div>
                         <div class="timeline-event-content">
@@ -171,16 +171,15 @@ function renderAllEvents(events) {
 // ============================================
 
 function handleEventClick(eventId, element) {
-    // Проверяем, включен ли режим выбора
+    const id = typeof eventId === 'string' ? eventId : String(eventId);
+    
     if (typeof isSelectMode === 'function' && isSelectMode()) {
-        // В режиме выбора - выбираем событие
         if (typeof selectEvent === 'function') {
-            selectEvent(eventId, element);
+            selectEvent(id, element);
         }
     } else {
-        // Обычный режим - показываем детали
         if (typeof showEventDetails === 'function') {
-            showEventDetails(eventId);
+            showEventDetails(id);
         }
     }
 }
@@ -217,21 +216,17 @@ function renderTimeline() {
     const container = document.getElementById("timeline");
     if (!container) return;
 
-    // Получаем отфильтрованные события
-    const events = typeof getFilteredEvents === 'function' 
-        ? getFilteredEvents() 
-        : calendarEvents;
+    const events = typeof getFilteredEvents === 'function' ? getFilteredEvents() : calendarEvents;
 
-    // Сортируем по дате и времени
     events.sort((a, b) => 
         a.date.localeCompare(b.date) || 
         (a.time || "00:00").localeCompare(b.time || "00:00")
     );
 
-    // Обновляем заголовок
-    updateViewTitle();
+    if (typeof updateViewTitle === 'function') {
+        updateViewTitle();
+    }
 
-    // Если событий нет - показываем пустое состояние
     if (events.length === 0) {
         container.innerHTML = `
             <div class="timeline-empty">
@@ -241,24 +236,51 @@ function renderTimeline() {
         return;
     }
 
-    // Выбираем правильный рендеринг в зависимости от текущего вида
-    let html = '';
     if (currentView === "day") {
-        html = renderDayEvents(events);
+        container.innerHTML = renderDayEvents(events);
     } else if (currentView === "week") {
-        html = renderWeekEvents(events);
+        container.innerHTML = renderWeekEvents(events);
     } else {
-        html = renderMonthEvents(events);
+        container.innerHTML = renderMonthEvents(events);
     }
     
-    container.innerHTML = html;
-    
-    // Восстанавливаем выбранные события после перерендера
-    restoreSelection();
+    if (typeof restoreSelection === 'function') {
+        restoreSelection();
+    }
 }
 
 // ============================================
-// ВОССТАНОВЛЕНИЕ ВЫБОРА ПОСЛЕ РЕНДЕРИНГА
+// ОБНОВЛЕНИЕ ЗАГОЛОВКА
+// ============================================
+
+function updateViewTitle() {
+    const title = document.getElementById('timelineTitle');
+    if (!title) return;
+    
+    if (state.searchQuery) {
+        const count = getFilteredEvents().length;
+        title.textContent = `🔍 Поиск: "${state.searchQuery}" (${count})`;
+        return;
+    }
+    
+    if (state.showAll) {
+        const count = getFilteredEvents().length;
+        title.textContent = `Все события (${count})`;
+        return;
+    }
+    
+    if (currentView === 'day') {
+        title.textContent = formatDateDisplay(selectedDate);
+    } else if (currentView === 'week') {
+        const range = getWeekRange(selectedDate);
+        title.textContent = `Неделя: ${range.display}`;
+    } else {
+        title.textContent = getMonthName(selectedDate.getMonth()) + ' ' + selectedDate.getFullYear();
+    }
+}
+
+// ============================================
+// ВОССТАНОВЛЕНИЕ ВЫБОРА
 // ============================================
 
 function restoreSelection() {
@@ -277,50 +299,17 @@ function restoreSelection() {
 }
 
 // ============================================
-// ОБНОВЛЕНИЕ ЗАГОЛОВКА
-// ============================================
-
-function updateViewTitle() {
-    const title = document.getElementById('timelineTitle');
-    if (!title) return;
-    
-    // Поиск
-    if (state.searchQuery) {
-        const count = getFilteredEvents().length;
-        title.textContent = `🔍 Поиск: "${state.searchQuery}" (${count})`;
-        return;
-    }
-    
-    // Режим "показать все"
-    if (state.showAll) {
-        const count = getFilteredEvents().length;
-        title.textContent = `Все события (${count})`;
-        return;
-    }
-    
-    // Стандартный режим
-    if (currentView === 'day') {
-        title.textContent = formatDateDisplay(selectedDate);
-    } else if (currentView === 'week') {
-        const range = getWeekRange(selectedDate);
-        title.textContent = `Неделя: ${range.display}`;
-    } else {
-        title.textContent = getMonthName(selectedDate.getMonth()) + ' ' + selectedDate.getFullYear();
-    }
-}
-
-// ============================================
 // ЭКСПОРТ
 // ============================================
 
 window.renderTimeline = renderTimeline;
-window.updateViewTitle = updateViewTitle;
-window.showSearchResults = showSearchResults;
-window.handleEventClick = handleEventClick;
 window.renderDayEvents = renderDayEvents;
 window.renderWeekEvents = renderWeekEvents;
 window.renderMonthEvents = renderMonthEvents;
 window.renderAllEvents = renderAllEvents;
+window.handleEventClick = handleEventClick;
+window.updateViewTitle = updateViewTitle;
+window.showSearchResults = showSearchResults;
 window.restoreSelection = restoreSelection;
 
-console.log('📅 Timeline module initialized');
+console.log('📅 Timeline module loaded');
