@@ -161,7 +161,6 @@ function saveCity() {
   localStorage.setItem("weather_city", city);
   document.getElementById("weatherSettings").style.display = "none";
   fetchWeather();
-  showToast(`🌤 ${city}`);
 }
 
 // ============================================

@@ -1518,7 +1518,7 @@ body {
     height: 36px;
     border: none;
     background: transparent;
-    border-radius: var(--radius);
+    border-radius: 50%;
     cursor: pointer;
     color: var(--text-secondary);
     transition: var(--transition);
@@ -1530,6 +1530,7 @@ body {
 .hamburger-btn:hover {
     background: var(--primary-bg);
     color: var(--primary);
+    transform: rotate(90deg);
 }
 
 .hamburger-menu {

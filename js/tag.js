@@ -15,8 +15,6 @@ function loadTags() {
 
     // Дефолтные теги
     tags = {
-        work: { id: "work", name: "Работа", color: "#6366f1" },
-        personal: { id: "personal", name: "Личное", color: "#22c55e" },
         important: { id: "important", name: "Важное", color: "#ef4444" },
     };
     saveTags();
@@ -143,14 +141,6 @@ function editTag(tagId) {
         el.classList.toggle("active", el.dataset.color === tag.color);
     });
 
-    const deleteBtn = document.getElementById("deleteTagBtn");
-    const protectedTags = ["work", "personal", "important"];
-    if (protectedTags.includes(tagId)) {
-        deleteBtn.style.display = "none";
-    } else {
-        deleteBtn.style.display = "flex";
-    }
-
     document.getElementById("editTagModal").classList.add("visible");
 }
 
@@ -199,10 +189,6 @@ function saveTagEdit() {
 
 function deleteTag() {
     if (!editingTagId) return;
-    if (["work", "personal", "important"].includes(editingTagId)) {
-        showToast("❌ Нельзя удалить стандартный тег");
-        return;
-    }
 
     const tag = tags[editingTagId];
     showConfirmDialog(
@@ -223,7 +209,6 @@ function deleteTag() {
             renderTags();
             renderMiniCalendar();
             renderTimeline();
-            showToast("Тег удалён");
         },
     );
 }
