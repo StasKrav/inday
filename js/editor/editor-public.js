@@ -249,63 +249,91 @@ function addImageField(value = '') {
     container.appendChild(div);
 }
 
+// ============================================
+// ЗАГРУЗКА НЕСКОЛЬКИХ ИЗОБРАЖЕНИЙ
+// ============================================
+
 async function uploadImage(button) {
     const field = button.closest('.editor-image-field');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
+    input.multiple = true;  // ✅ РАЗРЕШАЕМ ВЫБОР НЕСКОЛЬКИХ ФАЙЛОВ
     
     input.onchange = async function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
         
-        // Проверяем размер (максимум 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('❌ Файл слишком большой (максимум 5MB)', true);
-            return;
+        let loadedCount = 0;
+        let errorCount = 0;
+        
+        for (const file of files) {
+            // Проверяем размер (максимум 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast(`❌ ${file.name} слишком большой (максимум 5MB)`, true);
+                errorCount++;
+                continue;
+            }
+            
+            try {
+                // Сжимаем и конвертируем в base64
+                const base64 = await compressImage(file);
+                
+                // Добавляем новое поле с загруженным фото
+                addImageField(base64);
+                loadedCount++;
+                
+            } catch (error) {
+                console.error('❌ Ошибка загрузки:', error);
+                errorCount++;
+            }
         }
         
-        // Показываем превью
-        const preview = field.querySelector('.editor-upload-preview');
-        preview.style.display = 'block';
-        preview.innerHTML = `
-            <div style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:var(--background);border-radius:4px;">
-                <span>🔄 Загрузка...</span>
-                <span style="font-size:11px;color:var(--text-secondary);">${file.name}</span>
-            </div>
-        `;
-        
-        try {
-            // Конвертируем в base64
-            const base64 = await fileToBase64(file);
-            
-            // Вставляем в поле
-            const textInput = field.querySelector('input[type="text"]');
-            textInput.value = base64;
-            
-            // Показываем миниатюру
-            preview.innerHTML = `
-                <div style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:var(--primary-bg);border-radius:4px;border:1px solid var(--primary);">
-                    <span>✅ Загружено</span>
-                    <img src="${base64}" style="max-height:40px;border-radius:4px;">
-                    <span style="font-size:11px;color:var(--text-secondary);">${file.name}</span>
-                </div>
-            `;
-            
-            showToast(`✅ Изображение загружено: ${file.name}`);
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки:', error);
-            preview.innerHTML = `
-                <div style="padding:4px 8px;color:#ef4444;background:rgba(239,68,68,0.1);border-radius:4px;">
-                    ❌ Ошибка загрузки
-                </div>
-            `;
-            showToast('❌ Ошибка загрузки изображения', true);
+        if (loadedCount > 0) {
+            showToast(`✅ Загружено ${loadedCount} фото`);
+        }
+        if (errorCount > 0) {
+            showToast(`⚠️ ${errorCount} файлов не загружено`, true);
         }
     };
     
     input.click();
+}
+
+// ============================================
+// СЖАТИЕ ИЗОБРАЖЕНИЙ
+// ============================================
+
+function compressImage(file, maxWidth = 1200, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                // Вычисляем новые размеры
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > maxWidth) {
+                    height = height * (maxWidth / width);
+                    width = maxWidth;
+                }
+                
+                // Создаем canvas и сжимаем
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
 }
 
 // ============================================

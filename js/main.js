@@ -76,6 +76,13 @@ document.addEventListener("keydown", function (e) {
     }
 });
 
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+        e.preventDefault();
+        openPublicEventEditor();
+    }
+});
+
 // ============================================
 // ИНИЦИАЛИЗАЦИЯ ЦВЕТОВ (для тегов)
 // ============================================
