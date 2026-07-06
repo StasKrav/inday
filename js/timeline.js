@@ -37,10 +37,7 @@ function renderWeekEvents(events) {
 
     return sortedDates.map(date => {
         const dateObj = parseDateKey(date);
-        const dayLabel = dateObj.toLocaleDateString("ru-RU", {
-            weekday: "short",
-            day: "numeric"
-        });
+        const dayLabel = formatDateDisplay(dateObj, { weekday: 'short', day: 'numeric' });
         
         const dayEvents = grouped[date].sort((a, b) => 
             (a.time || "00:00").localeCompare(b.time || "00:00")
@@ -80,10 +77,7 @@ function renderMonthEvents(events) {
 
     return sortedDates.map(date => {
         const dateObj = parseDateKey(date);
-        const dayLabel = dateObj.toLocaleDateString("ru-RU", {
-            day: "numeric",
-            month: "short"
-        });
+         const dayLabel = formatDateDisplay(dateObj, { day: 'numeric', month: 'short' });
         
         const dayEvents = grouped[date].sort((a, b) => 
             (a.time || "00:00").localeCompare(b.time || "00:00")
@@ -123,11 +117,7 @@ function renderAllEvents(events) {
 
     return sortedDates.map(date => {
         const dateObj = parseDateKey(date);
-        const dateStr = dateObj.toLocaleDateString("ru-RU", {
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-        });
+        const dateStr = formatDateDisplay(dateObj);
 
         const dayEvents = grouped[date].sort((a, b) => 
             (a.time || "00:00").localeCompare(b.time || "00:00")
@@ -219,29 +209,23 @@ function updateViewTitle() {
     const title = document.getElementById('timelineTitle');
     if (!title) return;
     
-    // Поиск
     if (state.searchQuery) {
         const count = getFilteredEvents().length;
         title.textContent = `🔍 Поиск: "${state.searchQuery}" (${count})`;
         return;
     }
     
-    // Режим "показать все"
     if (state.showAll) {
         const count = getFilteredEvents().length;
         title.textContent = `Все события (${count})`;
         return;
     }
     
-    // Стандартный режим
-    const options = { day: 'numeric', month: 'long', year: 'numeric' };
     if (currentView === 'day') {
-        title.textContent = selectedDate.toLocaleDateString('ru-RU', options);
+        title.textContent = formatDateDisplay(selectedDate);
     } else if (currentView === 'week') {
-        const start = getWeekStart(selectedDate);
-        const end = new Date(start);
-        end.setDate(end.getDate() + 6);
-        title.textContent = `Неделя: ${start.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short'})} — ${end.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: 'numeric'})}`;
+        const range = getWeekRange(selectedDate);
+        title.textContent = `Неделя: ${range.display}`;
     } else {
         title.textContent = getMonthName(selectedDate.getMonth()) + ' ' + selectedDate.getFullYear();
     }
