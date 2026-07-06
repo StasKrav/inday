@@ -1659,3 +1659,102 @@ body {
     }
 }
 
+/* style.css - ДОБАВЛЯЕМ */
+
+/* ============================================
+   РЕЖИМ ВЫБОРА
+   ============================================ */
+
+/* Переключатель режима выбора */
+.timeline-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-icon.select-mode {
+    background: var(--primary-bg);
+    color: var(--primary);
+}
+
+/* Чекбокс события */
+.timeline-event {
+    position: relative;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.timeline-event .event-checkbox {
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+/* В режиме выбора показываем чекбоксы */
+.select-mode-active .timeline-event .event-checkbox {
+    display: flex;
+    pointer-events: auto;
+}
+
+/* Отступ для событий в режиме выбора */
+.select-mode-active .timeline-event {
+    padding-left: 28px;
+}
+
+/* Выбранное событие */
+.timeline-event.selected {
+    background: var(--primary-bg) !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+.timeline-event.selected .event-checkbox {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.timeline-event.selected .event-checkbox::after {
+    content: '✓';
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+}
+
+/* Анимация при выборе */
+@keyframes selectPop {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.timeline-event.selected {
+    animation: selectPop 0.2s ease;
+}
+
+/* Кнопка удаления выбранных */
+#deleteSelectedBtn {
+    color: #ef4444;
+}
+
+#deleteSelectedBtn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+#deleteSelectedBtn.active {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-radius: var(--radius);
+}

@@ -95,10 +95,10 @@
           <div class="hamburger-wrapper">
               <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleHamburgerMenu()">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                                      <circle cx="12" cy="5" r="1" class="dot"/>
-                                      <circle cx="12" cy="12" r="1" class="dot"/>
-                                      <circle cx="12" cy="19" r="1" class="dot"/>
-                                  </svg>
+                      <circle cx="12" cy="5" r="1" class="dot"/>
+                      <circle cx="12" cy="12" r="1" class="dot"/>
+                      <circle cx="12" cy="19" r="1" class="dot"/>
+                  </svg>
               </button>
               
               <!-- Выпадающее меню -->
@@ -132,9 +132,8 @@
               </div>
           </div>
 
-          <!-- Скрытый input для импорта - можно оставить в любом месте -->
+          <!-- Скрытый input для импорта -->
           <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="handleImport(event)">
-      
       
           <!-- Кнопка создания события -->
           <button class="btn-primary" id="headerAddBtn" onclick="showAddEventModal()" style="display: none">
@@ -192,13 +191,11 @@
           </div>
         </div>
 
-        <!-- Быстрые фильтры -->
+        <!-- Быстрые фильтры - ТЕПЕРЬ ТОЛЬКО "Все" -->
         <div class="filters-module">
           <div class="filter-chips">
             <button class="chip active" data-filter="all">Все</button>
-            <button class="chip" data-filter="work">Работа</button>
-            <button class="chip" data-filter="personal">Личное</button>
-            <button class="chip" data-filter="important">Важное</button>
+            <!-- Остальные теги рендерятся динамически через renderTags() -->
           </div>
         </div>
 
@@ -270,63 +267,46 @@
         <div class="timeline-module">
           <div class="timeline-header">
             <h2 id="timelineTitle">Сегодня</h2>
-            <div class="timeline-nav">
-              <button
-                class="nav-icon active"
-                onclick="changeView('day')"
-                id="viewDayBtn"
-                title="День"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect x="3" y="3" width="7" height="7" rx="1" />
-                  <rect x="14" y="3" width="7" height="7" rx="1" />
-                  <rect x="3" y="14" width="7" height="7" rx="1" />
-                  <rect x="14" y="14" width="7" height="7" rx="1" />
+            <div class="timeline-controls">
+              <!-- Переключатель режима выбора -->
+              <button class="nav-icon" id="selectModeBtn" onclick="toggleSelectMode()" title="Режим выбора">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <path d="M8 12l3 3 5-6"/>
                 </svg>
               </button>
-              <button
-                class="nav-icon"
-                onclick="changeView('week')"
-                id="viewWeekBtn"
-                title="Неделя"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect x="3" y="3" width="18" height="4" rx="1" />
-                  <rect x="3" y="10" width="18" height="4" rx="1" />
-                  <rect x="3" y="17" width="18" height="4" rx="1" />
+              
+              <!-- Кнопка удаления выбранных -->
+              <button class="nav-icon" id="deleteSelectedBtn" onclick="deleteSelectedEvents()" style="display:none" title="Удалить выбранные">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                 </svg>
+                <span id="selectedCount" style="font-size:10px;margin-left:2px;">0</span>
               </button>
-              <button
-                class="nav-icon"
-                onclick="changeView('month')"
-                id="viewMonthBtn"
-                title="Месяц"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="1" />
-                </svg>
-              </button>
+      
+              <div class="timeline-nav">
+                <button class="nav-icon active" onclick="changeView('day')" id="viewDayBtn" title="День">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                  </svg>
+                </button>
+                <button class="nav-icon" onclick="changeView('week')" id="viewWeekBtn" title="Неделя">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="4" rx="1" />
+                    <rect x="3" y="10" width="18" height="4" rx="1" />
+                    <rect x="3" y="17" width="18" height="4" rx="1" />
+                  </svg>
+                </button>
+                <button class="nav-icon" onclick="changeView('month')" id="viewMonthBtn" title="Месяц">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="1" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -535,28 +515,27 @@
           </div>
         
 
-        <div class="field">
-          <label>Теги (через запятую)</label>
-          <input
-            type="text"
-            class="field-input"
-            id="eventTags"
-            placeholder="Например: работа, проект, срочно"
-          />
-          <small
-            style="
-              color: var(--text-secondary);
-              opacity: 0.5;
-              font-size: 11px;
-              display: block;
-              margin-top: 4px;
-            "
-          >
-            Теги создаются автоматически
-          </small>
+          <div class="field">
+            <label>Теги (через запятую)</label>
+            <input
+              type="text"
+              class="field-input"
+              id="eventTags"
+              placeholder="Например: работа, проект, срочно"
+            />
+            <small
+              style="
+                color: var(--text-secondary);
+                opacity: 0.5;
+                font-size: 11px;
+                display: block;
+                margin-top: 4px;
+              "
+            >
+              Теги создаются автоматически
+            </small>
+          </div>
         </div>
-        </div>
-
 
         <div class="modal-footer">
           <button class="btn-cancel" onclick="closeAddEventModal()">
@@ -600,8 +579,6 @@
       </div>
     </div>
 
-    
-
     <!-- Модалка редактирования тега -->
     <div class="modal" id="editTagModal">
       <div class="modal-content" style="max-width: 400px">
@@ -644,7 +621,7 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
-<!-- FAB - Floating Action Button -->
+    <!-- FAB - Floating Action Button -->
     <button class="fab" onclick="showAddEventModal()">
       <svg
         width="28"
@@ -658,22 +635,31 @@
       </svg>
     </button>
 
-    
-	<script src="js/utils/date-utils.js"></script> 
-    <script src="js/hamburger.js"></script>
+    <!-- ============================================
+         ПОДКЛЮЧЕНИЕ СКРИПТОВ - ПРАВИЛЬНЫЙ ПОРЯДОК
+         ============================================ -->
+
+    <!-- 1. БАЗОВЫЕ УТИЛИТЫ (без зависимостей) -->
+    <script src="js/utils/date-utils.js"></script>
     <script src="js/utility.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/theme.js"></script>
+
+    <!-- 2. МОДУЛИ (с зависимостями от утилит) -->
+    <script src="js/selection.js"></script>
+    <script src="js/hamburger.js"></script>
     <script src="js/widgets.js"></script>
     <script src="js/tag.js"></script>
     <script src="js/details.js"></script>
     <script src="js/timeline.js"></script>
     <script src="js/navigation.js"></script>
-    <script src="js/toast.js"></script>     <!-- ⬅️ toast.js ПОСЛЕ confirm.js -->
     <script src="js/calendar.js"></script>
     <script src="js/events.js"></script>
     <script src="js/modals.js"></script>
-    <script src="js/confirm.js"></script>   <!-- ⬅️ confirm.js ДО toast.js -->
-    <script src="js/theme.js"></script>
+    <script src="js/confirm.js"></script>
     <script src="js/filters.js"></script>
+
+    <!-- 3. ГЛАВНЫЙ ФАЙЛ (САМЫЙ ПОСЛЕДНИЙ) -->
     <script src="js/main.js"></script>
   </body>
 </html>

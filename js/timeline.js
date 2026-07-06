@@ -1,4 +1,6 @@
-// timeline.js - С ПОИСКОМ
+// ============================================
+// TIMELINE.JS - ПОЛНАЯ ВЕРСИЯ С МУЛЬТИ-ВЫБОРОМ
+// ============================================
 
 // ============================================
 // РЕНДЕРИНГ СОБЫТИЙ
@@ -12,7 +14,10 @@ function renderDayEvents(events) {
     events.sort((a, b) => (a.time || "00:00").localeCompare(b.time || "00:00"));
 
     return events.map(event => `
-        <div class="timeline-event" style="border-left-color: ${event.color}" onclick="showEventDetails('${event.id}')">
+        <div class="timeline-event" id="event-${event.id}" 
+             style="border-left-color: ${event.color}" 
+             onclick="handleEventClick(${event.id}, this)">
+            <div class="event-checkbox"></div>
             <div class="timeline-event-time">${event.time || "Весь день"}</div>
             <div class="timeline-event-content">
                 <div class="timeline-event-title">${escapeHtml(event.title)}</div>
@@ -37,7 +42,10 @@ function renderWeekEvents(events) {
 
     return sortedDates.map(date => {
         const dateObj = parseDateKey(date);
-        const dayLabel = formatDateDisplay(dateObj, { weekday: 'short', day: 'numeric' });
+        const dayLabel = formatDateDisplay(dateObj, {
+            weekday: "short",
+            day: "numeric"
+        });
         
         const dayEvents = grouped[date].sort((a, b) => 
             (a.time || "00:00").localeCompare(b.time || "00:00")
@@ -49,7 +57,10 @@ function renderWeekEvents(events) {
                     ${dayLabel}
                 </div>
                 ${dayEvents.map(event => `
-                    <div class="timeline-event" style="border-left-color: ${event.color}" onclick="showEventDetails('${event.id}')">
+                    <div class="timeline-event" id="event-${event.id}" 
+                         style="border-left-color: ${event.color}" 
+                         onclick="handleEventClick(${event.id}, this)">
+                        <div class="event-checkbox"></div>
                         <div class="timeline-event-time">${event.time || "Весь день"}</div>
                         <div class="timeline-event-content">
                             <div class="timeline-event-title">${escapeHtml(event.title)}</div>
@@ -77,7 +88,10 @@ function renderMonthEvents(events) {
 
     return sortedDates.map(date => {
         const dateObj = parseDateKey(date);
-         const dayLabel = formatDateDisplay(dateObj, { day: 'numeric', month: 'short' });
+        const dayLabel = formatDateDisplay(dateObj, {
+            day: "numeric",
+            month: "short"
+        });
         
         const dayEvents = grouped[date].sort((a, b) => 
             (a.time || "00:00").localeCompare(b.time || "00:00")
@@ -89,7 +103,10 @@ function renderMonthEvents(events) {
                     ${dayLabel}
                 </div>
                 ${dayEvents.map(event => `
-                    <div class="timeline-event" style="border-left-color: ${event.color}" onclick="showEventDetails('${event.id}')">
+                    <div class="timeline-event" id="event-${event.id}" 
+                         style="border-left-color: ${event.color}" 
+                         onclick="handleEventClick(${event.id}, this)">
+                        <div class="event-checkbox"></div>
                         <div class="timeline-event-time">${event.time || "Весь день"}</div>
                         <div class="timeline-event-content">
                             <div class="timeline-event-title">${escapeHtml(event.title)}</div>
@@ -117,7 +134,11 @@ function renderAllEvents(events) {
 
     return sortedDates.map(date => {
         const dateObj = parseDateKey(date);
-        const dateStr = formatDateDisplay(dateObj);
+        const dateStr = formatDateDisplay(dateObj, {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
 
         const dayEvents = grouped[date].sort((a, b) => 
             (a.time || "00:00").localeCompare(b.time || "00:00")
@@ -129,7 +150,10 @@ function renderAllEvents(events) {
                     ${dateStr}
                 </div>
                 ${dayEvents.map(event => `
-                    <div class="timeline-event" style="border-left-color: ${event.color}" onclick="showEventDetails('${event.id}')">
+                    <div class="timeline-event" id="event-${event.id}" 
+                         style="border-left-color: ${event.color}" 
+                         onclick="handleEventClick(${event.id}, this)">
+                        <div class="event-checkbox"></div>
                         <div class="timeline-event-time">${event.time || "Весь день"}</div>
                         <div class="timeline-event-content">
                             <div class="timeline-event-title">${escapeHtml(event.title)}</div>
@@ -140,6 +164,25 @@ function renderAllEvents(events) {
             </div>
         `;
     }).join("");
+}
+
+// ============================================
+// ОБРАБОТЧИК КЛИКА ПО СОБЫТИЮ
+// ============================================
+
+function handleEventClick(eventId, element) {
+    // Проверяем, включен ли режим выбора
+    if (typeof isSelectMode === 'function' && isSelectMode()) {
+        // В режиме выбора - выбираем событие
+        if (typeof selectEvent === 'function') {
+            selectEvent(eventId, element);
+        }
+    } else {
+        // Обычный режим - показываем детали
+        if (typeof showEventDetails === 'function') {
+            showEventDetails(eventId);
+        }
+    }
 }
 
 // ============================================
@@ -174,15 +217,21 @@ function renderTimeline() {
     const container = document.getElementById("timeline");
     if (!container) return;
 
-    const events = typeof getFilteredEvents === 'function' ? getFilteredEvents() : calendarEvents;
+    // Получаем отфильтрованные события
+    const events = typeof getFilteredEvents === 'function' 
+        ? getFilteredEvents() 
+        : calendarEvents;
 
+    // Сортируем по дате и времени
     events.sort((a, b) => 
         a.date.localeCompare(b.date) || 
         (a.time || "00:00").localeCompare(b.time || "00:00")
     );
 
+    // Обновляем заголовок
     updateViewTitle();
 
+    // Если событий нет - показываем пустое состояние
     if (events.length === 0) {
         container.innerHTML = `
             <div class="timeline-empty">
@@ -192,12 +241,38 @@ function renderTimeline() {
         return;
     }
 
+    // Выбираем правильный рендеринг в зависимости от текущего вида
+    let html = '';
     if (currentView === "day") {
-        container.innerHTML = renderDayEvents(events);
+        html = renderDayEvents(events);
     } else if (currentView === "week") {
-        container.innerHTML = renderWeekEvents(events);
+        html = renderWeekEvents(events);
     } else {
-        container.innerHTML = renderMonthEvents(events);
+        html = renderMonthEvents(events);
+    }
+    
+    container.innerHTML = html;
+    
+    // Восстанавливаем выбранные события после перерендера
+    restoreSelection();
+}
+
+// ============================================
+// ВОССТАНОВЛЕНИЕ ВЫБОРА ПОСЛЕ РЕНДЕРИНГА
+// ============================================
+
+function restoreSelection() {
+    if (typeof isSelectMode === 'function' && isSelectMode()) {
+        const ids = typeof getSelectedIds === 'function' ? getSelectedIds() : [];
+        ids.forEach(id => {
+            const el = document.getElementById(`event-${id}`);
+            if (el) {
+                el.classList.add('selected');
+            }
+        });
+        if (typeof updateSelectionUI === 'function') {
+            updateSelectionUI();
+        }
     }
 }
 
@@ -209,18 +284,21 @@ function updateViewTitle() {
     const title = document.getElementById('timelineTitle');
     if (!title) return;
     
+    // Поиск
     if (state.searchQuery) {
         const count = getFilteredEvents().length;
         title.textContent = `🔍 Поиск: "${state.searchQuery}" (${count})`;
         return;
     }
     
+    // Режим "показать все"
     if (state.showAll) {
         const count = getFilteredEvents().length;
         title.textContent = `Все события (${count})`;
         return;
     }
     
+    // Стандартный режим
     if (currentView === 'day') {
         title.textContent = formatDateDisplay(selectedDate);
     } else if (currentView === 'week') {
@@ -238,7 +316,11 @@ function updateViewTitle() {
 window.renderTimeline = renderTimeline;
 window.updateViewTitle = updateViewTitle;
 window.showSearchResults = showSearchResults;
+window.handleEventClick = handleEventClick;
 window.renderDayEvents = renderDayEvents;
 window.renderWeekEvents = renderWeekEvents;
 window.renderMonthEvents = renderMonthEvents;
 window.renderAllEvents = renderAllEvents;
+window.restoreSelection = restoreSelection;
+
+console.log('📅 Timeline module initialized');
