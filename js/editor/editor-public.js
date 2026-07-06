@@ -162,9 +162,6 @@ function createEditorModal() {
                 
                 <!-- Видео -->
                 <div class="editor-section">
-                    <div class="editor-section-header">
-                        <label style="font-weight:600;font-size:14px;">Видео (YouTube)</label>
-                    </div>
                     <div class="editor-section">
                         <div class="editor-section-header">
                             <label style="font-weight:600;font-size:14px;">Видео</label>
@@ -494,7 +491,7 @@ function loadEventToEditor(event) {
 
 function clearEditor() {
     editingPublicEventId = null;
-    document.getElementById('editorTitle').textContent = '📝 Создание публичного события';
+    document.getElementById('editorTitle').textContent = 'Создание публичного события';
     document.getElementById('editorTitleInput').value = '';
     document.getElementById('editorDateInput').value = formatDateKey(new Date());
     document.getElementById('editorTimeInput').value = '';
@@ -873,7 +870,6 @@ function addEditorStyles() {
             height: 32px;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid transparent;
             transition: all 0.2s ease;
         }
         
@@ -883,7 +879,7 @@ function addEditorStyles() {
         
         .editor-color-option.active {
             border-color: var(--text);
-            transform: scale(1.15);
+            transform: scale(1.4);
             box-shadow: 0 0 12px rgba(0,0,0,0.2);
         }
         
