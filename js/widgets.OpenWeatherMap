@@ -1,0 +1,446 @@
+// ============================================
+// ПОГОДА - ФИНАЛЬНАЯ ВЕРСИЯ
+// ============================================
+
+let weatherCity = "Perm";
+let weatherEnabled = true;
+let weatherInterval = null;
+let weatherInitDone = false;
+let lastWeatherUpdate = 0;
+let weatherData = null;
+let weatherFetching = false;
+
+// ============================================
+// ЗАГРУЗКА СОСТОЯНИЯ
+// ============================================
+function loadWeatherState() {
+    const savedCity = localStorage.getItem("weather_city");
+    if (savedCity) weatherCity = savedCity;
+
+    const savedEnabled = localStorage.getItem("weather_enabled");
+    if (savedEnabled !== null) {
+        weatherEnabled = savedEnabled === "true";
+    } else {
+        weatherEnabled = true;
+        localStorage.setItem("weather_enabled", "true");
+    }
+    
+    const cached = localStorage.getItem("weather_cache");
+    if (cached) {
+        try {
+            const parsed = JSON.parse(cached);
+            if (parsed.data && parsed.timestamp) {
+                const age = Date.now() - parsed.timestamp;
+                if (age < 7200000) { // 2 часа
+                    weatherData = parsed.data;
+                    lastWeatherUpdate = parsed.timestamp;
+                }
+            }
+        } catch (e) {}
+    }
+}
+
+function saveWeatherState() {
+    localStorage.setItem("weather_enabled", String(weatherEnabled));
+    localStorage.setItem("weather_city", weatherCity);
+}
+
+function saveWeatherCache(data) {
+    const cache = {
+        data: data,
+        timestamp: Date.now()
+    };
+    localStorage.setItem("weather_cache", JSON.stringify(cache));
+    weatherData = data;
+    lastWeatherUpdate = Date.now();
+}
+
+// ============================================
+// ВКЛ/ВЫКЛ ПОГОДЫ
+// ============================================
+function toggleWeather() {
+    weatherEnabled = !weatherEnabled;
+    
+    const module = document.getElementById("weatherModule");
+    const btn = document.getElementById("weatherToggleBtn");
+    const content = document.getElementById("weatherContent");
+    const settings = document.getElementById("weatherSettings");
+    
+    if (weatherEnabled) {
+        module?.classList.remove("disabled");
+        module.style.opacity = "1";
+        content.style.display = "block";
+        btn?.classList.add("active");
+        if (settings) settings.style.display = "none";
+        fetchWeather();
+        startWeatherInterval();
+    } else {
+        module?.classList.add("disabled");
+        module.style.opacity = "0.3";
+        content.style.display = "none";
+        btn?.classList.remove("active");
+        if (settings) settings.style.display = "none";
+        stopWeatherInterval();
+    }
+    
+    saveWeatherState();
+}
+
+// ============================================
+// ПОЛУЧЕНИЕ SVG ИКОНКИ
+// ============================================
+function getWeatherSVG(iconCode) {
+    const color = '#f59e0b';
+    
+    const icons = {
+        '01d': `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>`,
+        
+        '02d': `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a9 9 0 0 1 9 9"/>
+            <path d="M8 17a5 5 0 0 1 0-10 5 5 0 0 1 9.9-1.1"/>
+            <path d="M17 8a4 4 0 0 1 0 8h-9a4 4 0 0 1 0-8"/>
+        </svg>`,
+        
+        '03d': `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/>
+        </svg>`,
+        
+        '04d': `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/>
+            <path d="M3 12h18" stroke-opacity="0.5"/>
+        </svg>`,
+        
+        '09d': `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/>
+            <path d="M10 19v2M14 19v2M18 19v2" stroke="#60a5fa"/>
+        </svg>`,
+        
+        '10d': `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/>
+            <path d="M9 19v2M13 19v2M17 19v2" stroke="#60a5fa"/>
+        </svg>`,
+        
+        '11d': `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/>
+            <path d="M12 14l-2 4h4l-2 4" stroke="#f59e0b"/>
+        </svg>`,
+        
+        '13d': `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/>
+            <path d="M10 16l2-2M14 16l-2-2M12 12v4" stroke="#e2e8f0"/>
+        </svg>`,
+        
+        '50d': `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/>
+            <path d="M5 16h14M6 19h12" stroke="#94a3b8" stroke-opacity="0.5"/>
+        </svg>`
+    };
+    
+    // Ночные версии используем те же иконки (для простоты)
+    const dayIcon = iconCode.replace('n', 'd');
+    return icons[dayIcon] || icons['01d'];
+}
+
+// ============================================
+// ЗАПРОС ПОГОДЫ
+// ============================================
+async function fetchWeather() {
+    if (!weatherEnabled) {
+        return;
+    }
+    
+    if (weatherFetching) {
+        return;
+    }
+    
+    // Проверяем кэш - 2 часа
+    if (weatherData && lastWeatherUpdate) {
+        const age = Date.now() - lastWeatherUpdate;
+        if (age < 7200000) { // 2 часа
+            renderWeather(weatherData);
+            return;
+        }
+    }
+    
+    weatherFetching = true;
+    
+    const city = weatherCity || 'Perm';
+    const apiKey = 'bd5e378503939ddaee76f12ad7a97608';
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&lang=ru&appid=${apiKey}`;
+    
+    console.log(`🌤 Запрос погоды для: ${city}`);
+    
+    const content = document.getElementById("weatherContent");
+    if (content) {
+        content.innerHTML = `
+            <div style="text-align:center;padding:15px;opacity:0.6;">
+                <div style="display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top:2px solid var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                <br><small style="margin-top:8px;display:block;">Загрузка...</small>
+            </div>
+        `;
+    }
+    
+    try {
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            if (response.status === 429) {
+                console.warn('⚠️ Лимит запросов превышен');
+                if (weatherData) {
+                    renderWeather(weatherData);
+                    if (content) {
+                        content.innerHTML += `
+                            <div style="text-align:center;padding:4px;font-size:11px;color:#ef4444;opacity:0.6;">
+                                Лимит запросов, данные от ${new Date(lastWeatherUpdate).toLocaleTimeString()}
+                            </div>
+                        `;
+                    }
+                } else {
+                    if (content) {
+                        content.innerHTML = `
+                            <div style="text-align:center;padding:20px;opacity:0.5;">
+                                Лимит запросов<br>
+                                <small style="font-size:11px;">Попробуйте через 2 часа</small>
+                            </div>
+                        `;
+                    }
+                }
+                weatherFetching = false;
+                return;
+            }
+            throw new Error(`Ошибка ${response.status}`);
+        }
+        
+        const data = await response.json();
+        saveWeatherCache(data);
+        renderWeather(data);
+        
+    } catch (error) {
+        console.error('❌ Weather error:', error);
+        if (weatherData) {
+            renderWeather(weatherData);
+            if (content) {
+                content.innerHTML += `
+                    <div style="text-align:center;padding:4px;font-size:11px;color:#ef4444;opacity:0.6;">
+                        Ошибка обновления, показаны кэшированные данные
+                    </div>
+                `;
+            }
+        } else {
+            if (content) {
+                content.innerHTML = `
+                    <div style="text-align:center;padding:20px;opacity:0.5;">
+                        ❌ Ошибка загрузки<br>
+                        <small style="font-size:11px;">${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+    }
+    
+    weatherFetching = false;
+}
+
+// ============================================
+// ОТРИСОВКА ПОГОДЫ (БЕЗ ЭМОДЗИ)
+// ============================================
+function renderWeather(data) {
+    const content = document.getElementById("weatherContent");
+    if (!content) return;
+    
+    const temp = Math.round(data.main.temp);
+    const feelsLike = Math.round(data.main.feels_like);
+    const description = data.weather[0].description;
+    const icon = data.weather[0].icon;
+    const city = data.name;
+    const humidity = data.main.humidity;
+    const wind = Math.round(data.wind.speed);
+    const pressure = data.main.pressure;
+    
+    const weatherIcon = getWeatherSVG(icon);
+    
+    content.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;padding:4px 0;">
+            <div style="flex-shrink:0;width:48px;height:48px;display:flex;align-items:center;justify-content:center;">
+                ${weatherIcon}
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:22px;font-weight:600;line-height:1.2;">
+                    ${temp}°
+                    <span style="font-size:14px;font-weight:400;opacity:0.6;margin-left:4px;">C</span>
+                </div>
+                <div style="font-size:13px;opacity:0.7;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    ${description}
+                </div>
+                <div style="font-size:11px;opacity:0.5;margin-top:2px;">
+                    ${city} • ощущается ${feelsLike}°
+                </div>
+            </div>
+            <div style="text-align:right;font-size:12px;opacity:0.5;line-height:1.6;flex-shrink:0;">
+                <div>💧 ${humidity}%</div>
+                <div>🌬 ${wind} м/с</div>
+                <div>📊 ${pressure} гПа</div>
+            </div>
+        </div>
+        <div style="font-size:10px;opacity:0.3;text-align:right;margin-top:2px;">
+            обновлено ${new Date().toLocaleTimeString()}
+        </div>
+    `;
+}
+
+// ============================================
+// ИНТЕРВАЛ ОБНОВЛЕНИЯ (2 ЧАСА)
+// ============================================
+function startWeatherInterval() {
+    stopWeatherInterval();
+    weatherInterval = setInterval(() => {
+        fetchWeather();
+    }, 7200000); // 2 часа
+}
+
+function stopWeatherInterval() {
+    if (weatherInterval) {
+        clearInterval(weatherInterval);
+        weatherInterval = null;
+    }
+}
+
+// ============================================
+// НАСТРОЙКИ
+// ============================================
+function toggleWeatherSettings() {
+    if (!weatherEnabled) {
+        showToast('❌ Сначала включите погоду', true);
+        return;
+    }
+    const settings = document.getElementById("weatherSettings");
+    if (!settings) return;
+    
+    const isVisible = settings.style.display === "block";
+    settings.style.display = isVisible ? "none" : "block";
+    
+    if (!isVisible) {
+        const input = document.getElementById("cityInput");
+        if (input) {
+            input.value = weatherCity;
+            setTimeout(() => input.focus(), 100);
+        }
+    }
+}
+
+function saveCity() {
+    const input = document.getElementById("cityInput");
+    if (!input) return;
+    
+    const city = input.value.trim();
+    if (!city) {
+        showToast('❌ Введите название города', true);
+        return;
+    }
+    
+    weatherCity = city;
+    saveWeatherState();
+    
+    const settings = document.getElementById("weatherSettings");
+    if (settings) settings.style.display = "none";
+    
+    showToast(`✅ Город сохранен: ${city}`);
+    fetchWeather();
+}
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ
+// ============================================
+function initWeather() {
+    if (weatherInitDone) {
+        return;
+    }
+    weatherInitDone = true;
+    
+    
+    loadWeatherState();
+    
+    const module = document.getElementById("weatherModule");
+    const btn = document.getElementById("weatherToggleBtn");
+    const settingsBtn = document.getElementById("weatherSettingsBtn");
+    const saveBtn = document.getElementById("citySaveBtn");
+    const content = document.getElementById("weatherContent");
+    const input = document.getElementById("cityInput");
+    
+    if (input) input.value = weatherCity;
+    
+    if (btn && !btn._listenerAdded) {
+        btn._listenerAdded = true;
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+            toggleWeather();
+        });
+  }
+    
+    if (settingsBtn && !settingsBtn._listenerAdded) {
+        settingsBtn._listenerAdded = true;
+        settingsBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            toggleWeatherSettings();
+        });
+    }
+    
+    if (saveBtn && !saveBtn._listenerAdded) {
+        saveBtn._listenerAdded = true;
+        saveBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            saveCity();
+        });
+    }
+    
+    if (input && !input._listenerAdded) {
+        input._listenerAdded = true;
+        input.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") saveCity();
+        });
+    }
+    
+    if (weatherEnabled) {
+        module?.classList.remove("disabled");
+        module.style.opacity = "1";
+        content.style.display = "block";
+        btn?.classList.add("active");
+        
+        if (weatherData) {
+            renderWeather(weatherData);
+        }
+        
+        setTimeout(() => {
+            fetchWeather();
+        }, 500);
+        startWeatherInterval();
+    } else {
+        module?.classList.add("disabled");
+        module.style.opacity = "0.3";
+        content.style.display = "none";
+        btn?.classList.remove("active");
+        stopWeatherInterval();
+    }
+}
+
+// ============================================
+// ЗАПУСК
+// ============================================
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWeather);
+} else {
+    initWeather();
+}
+
+// ============================================
+// ЭКСПОРТ
+// ============================================
+window.toggleWeather = toggleWeather;
+window.fetchWeather = fetchWeather;
+window.saveCity = saveCity;
+window.toggleWeatherSettings = toggleWeatherSettings;
+window.weatherEnabled = weatherEnabled;
+window.weatherCity = weatherCity;

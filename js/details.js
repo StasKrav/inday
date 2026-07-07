@@ -952,5 +952,3 @@ window.renderPublicEvent = renderPublicEvent;
 window.renderMarkdown = renderMarkdown;
 window.openImageGallery = openImageGallery;
 window.updateDetailsFooter = updateDetailsFooter;
-
-console.log('📋 Universal details module loaded');

@@ -276,5 +276,4 @@ window.initSearch = initSearch;
 document.addEventListener('DOMContentLoaded', function() {
     initSearch();
     resetFilters();
-    console.log('🔍 Фильтры инициализированы');
 });

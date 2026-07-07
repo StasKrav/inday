@@ -37,4 +37,3 @@ function showToast(message, isError = false) {
 // Делаем глобальной
 window.showToast = showToast;
 
-console.log('✅ Toast initialized');

@@ -201,4 +201,3 @@ window.getWeekEnd = getWeekEnd;
 window.getWeekRange = getWeekRange;
 window.isValidDateStr = isValidDateStr;
 
-console.log('📅 Date utils initialized');

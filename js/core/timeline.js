@@ -311,5 +311,3 @@ window.handleEventClick = handleEventClick;
 window.updateViewTitle = updateViewTitle;
 window.showSearchResults = showSearchResults;
 window.restoreSelection = restoreSelection;
-
-console.log('📅 Timeline module loaded');

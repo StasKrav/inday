@@ -1019,7 +1019,6 @@ function addEditorStyles() {
 
 document.addEventListener('DOMContentLoaded', function() {
     addEditorStyles();
-    console.log('📝 Public event editor loaded');
 });
 
 // ============================================
@@ -1035,5 +1034,3 @@ window.addImageField = addImageField;
 window.addSectionField = addSectionField;
 window.addAdField = addAdField;
 window.toggleMarkdownHelp = toggleMarkdownHelp;
-
-console.log('📝 Editor module loaded');

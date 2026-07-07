@@ -28,4 +28,3 @@ window.isPersonalEvent = isPersonalEvent;
 window.isPublicEvent = isPublicEvent;
 window.getEventType = getEventType;
 
-console.log('📋 Event types loaded');

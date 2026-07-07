@@ -150,5 +150,3 @@ window.deleteSelectedEvents = deleteSelectedEvents;
 window.getSelectedEvents = getSelectedEvents;
 window.isSelectMode = isSelectMode;
 window.updateSelectionUI = updateSelectionUI;
-
-console.log('✅ Selection mode initialized');
