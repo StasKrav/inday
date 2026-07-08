@@ -93,7 +93,19 @@ document.addEventListener("keydown", function (e) {
             if (typeof closeDetails === 'function') closeDetails(); // ✅ Теперь есть проверка
             if (typeof closeAdminLoginModal === 'function') closeAdminLoginModal();
         }
+
+        // ⌘Alt+B / Ctrl+Alt+B — открыть редактор блоков
+        if ((e.metaKey || e.ctrlKey) && e.altKey && e.key === "b") {
+            e.preventDefault();
+            console.log('⌘Alt+B нажат!');
+            if (typeof openBlockEditor === 'function') {
+                openBlockEditor();
+            } else {
+                showToast('❌ Редактор блоков не найден', true);
+            }
+        }
     });
+    
 // ============================================
 // ИНИЦИАЛИЗАЦИЯ ЦВЕТОВ (для тегов)
 // ============================================

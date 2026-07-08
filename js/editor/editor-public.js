@@ -61,7 +61,7 @@ function openPublicEventEditor(eventId = null) {
     } else {
         // Новое событие
         clearEditor();
-        document.getElementById('editorTitle').textContent = '📌 Создание публичного события';
+        document.getElementById('editorTitle').textContent = 'Создание публичного события';
     }
     
     modal.classList.add('visible');
@@ -285,9 +285,17 @@ function addImageField(value = '') {
             <input type="text" class="editor-input" style="flex:1;min-width:150px;" 
                    placeholder="https://example.com/image.jpg" value="${value}">
             <button class="editor-upload-btn" onclick="uploadImage(this)" title="Загрузить файл">
-                📁
+                <svg width="20" height="20" viewBox="0 0 544 480">
+                <path d="M80,144 L464,144 L464,400 L80,400 Z" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M80,144 L80,80" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+                <path d="M80,80 L208,80" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+                <path d="M208,80 C208,112 240,144 272,144" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+                </svg>
             </button>
-            <button class="editor-remove-btn" onclick="this.parentElement.parentElement.remove()">✕</button>
+            <button class="editor-remove-btn" onclick="this.parentElement.parentElement.remove()"><svg width="20" height="20" viewBox="0 0 288 288">
+            <path d="M80,80 L208,208" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+            <path d="M80,208 L208,80" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+            </svg></button>
         </div>
         ${value ? `<div style="margin-top:4px;"><img src="${value}" style="max-height:60px;border-radius:4px;border:1px solid var(--border);"></div>` : ''}
         <div class="editor-upload-preview" style="display:none;margin-top:4px;"></div>
@@ -406,9 +414,20 @@ function addVideoField(value = '') {
             <input type="text" class="editor-input" style="flex:1;min-width:150px;" 
                    placeholder="https://www.youtube.com/embed/..." value="${value}">
             <button class="editor-upload-btn" onclick="uploadVideo(this)" title="Загрузить видео файл">
-                📁
+                <svg width="20" height="20" viewBox="0 0 544 480">
+                    <path d="M80,144 L464,144 L464,400 L80,400 Z" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M80,144 L80,80" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+                    <path d="M80,80 L208,80" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+                    <path d="M208,80 C208,112 240,144 272,144" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+                </svg>
             </button>
-            ${value ? `<button class="editor-remove-btn" onclick="this.parentElement.parentElement.remove()">✕</button>` : ''}
+            <!-- ✅ КНОПКА УДАЛЕНИЯ ВСЕГДА ПОКАЗЫВАЕТСЯ -->
+            <button class="editor-remove-btn" onclick="this.parentElement.parentElement.remove()">
+                <svg width="20" height="20" viewBox="0 0 288 288">
+                    <path d="M80,80 L208,208" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+                    <path d="M80,208 L208,80" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+                </svg>
+            </button>
         </div>
         ${value ? `<div style="margin-top:4px;font-size:12px;color:var(--text-secondary);">🎬 Видео загружено</div>` : ''}
         <div class="editor-upload-preview" style="display:none;margin-top:4px;"></div>
@@ -440,7 +459,7 @@ async function uploadVideo(button) {
         preview.style.display = 'block';
         preview.innerHTML = `
             <div style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:var(--background);border-radius:4px;">
-                <span>🔄 Загрузка...</span>
+                <span>Загрузка...</span>
                 <span style="font-size:11px;color:var(--text-secondary);">${file.name}</span>
             </div>
         `;
@@ -453,13 +472,13 @@ async function uploadVideo(button) {
             
             preview.innerHTML = `
                 <div style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:var(--primary-bg);border-radius:4px;border:1px solid var(--primary);">
-                    <span>✅ Видео загружено</span>
+                    <span>Видео загружено</span>
                     <span style="font-size:11px;color:var(--text-secondary);">${file.name}</span>
                     <video src="${base64}" style="max-height:40px;border-radius:4px;" muted></video>
                 </div>
             `;
             
-            showToast(`✅ Видео загружено: ${file.name}`);
+            showToast(`Видео загружено: ${file.name}`);
             
         } catch (error) {
             console.error('❌ Ошибка загрузки:', error);
@@ -483,7 +502,10 @@ function addSectionField(title = '', content = '', icon = '📌') {
         <div style="display:flex;gap:8px;margin-bottom:4px;">
             <input type="text" class="editor-input" style="flex:0.5;" placeholder="Иконка" value="${icon}">
             <input type="text" class="editor-input" style="flex:2;" placeholder="Название секции" value="${title}">
-            <button class="editor-remove-btn" onclick="this.parentElement.parentElement.remove()">✕</button>
+            <button class="editor-remove-btn" onclick="this.parentElement.parentElement.remove()"><svg width="20" height="20" viewBox="0 0 288 288">
+            <path d="M80,80 L208,208" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+            <path d="M80,208 L208,80" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+            </svg></button>
         </div>
         <textarea class="editor-textarea" rows="3" placeholder="Содержание секции (Markdown)">${content}</textarea>
     `;
@@ -497,7 +519,10 @@ function addAdField(title = '', description = '', image = '', link = '', buttonT
     div.innerHTML = `
         <div style="display:flex;gap:8px;margin-bottom:4px;">
             <input type="text" class="editor-input" style="flex:2;" placeholder="Заголовок рекламы" value="${title}">
-            <button class="editor-remove-btn" onclick="this.parentElement.parentElement.remove()">✕</button>
+            <button class="editor-remove-btn" onclick="this.parentElement.parentElement.remove()"><svg width="20" height="20" viewBox="0 0 288 288">
+            <path d="M80,80 L208,208" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+            <path d="M80,208 L208,80" stroke="currentColor" stroke-width="16" fill="none" stroke-linecap="round"/>
+            </svg></button>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:4px;">
             <input type="text" class="editor-input" style="flex:1;" placeholder="Описание" value="${description}">
@@ -1081,3 +1106,580 @@ window.addImageField = addImageField;
 window.addSectionField = addSectionField;
 window.addAdField = addAdField;
 window.toggleMarkdownHelp = toggleMarkdownHelp;
+
+// ============================================
+// РЕДАКТОР БЛОКОВ
+// ============================================
+
+let editingBlockId = null;
+let blockEvents = [];
+
+function openBlockEditor(blockId = null) {
+    const isAdmin = localStorage.getItem('calendar_admin_mode') === 'true';
+    if (!isAdmin) {
+        showAdminLoginModal();
+        return;
+    }
+    
+    let modal = document.getElementById('blockEditorModal');
+    if (!modal) {
+        modal = createBlockEditorModal();
+        document.body.appendChild(modal);
+    }
+    
+    if (blockId) {
+        const block = calendarBlocks.find(b => b.id === blockId);
+        if (block) {
+            loadBlockToEditor(block);
+        }
+    } else {
+        clearBlockEditor();
+    }
+    
+    modal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+}
+
+function createBlockEditorModal() {
+    const modal = document.createElement('div');
+    modal.id = 'blockEditorModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content editor-modal" style="max-width: 800px;">
+            <div class="modal-header editor-header">
+                <div style="display:flex;align-items:center;gap:12px;flex:1;">
+                    <h3 style="font-size:18px;margin:0;" id="blockEditorTitle">📦 Управление блоком событий</h3>
+                </div>
+                <button class="modal-close" onclick="closeBlockEditor()">✕</button>
+            </div>
+            
+            <div class="modal-body editor-body">
+                <!-- Информация о блоке -->
+                <div class="editor-section">
+                    <div class="editor-row">
+                        <div class="editor-field">
+                            <label>Название блока *</label>
+                            <input type="text" id="blockTitleInput" class="editor-input" placeholder="Например: Репертуар театра на август 2026">
+                        </div>
+                    </div>
+                    
+                    <div class="editor-row">
+                        <div class="editor-field">
+                            <label>Описание блока</label>
+                            <textarea id="blockDescriptionInput" class="editor-textarea" rows="2" placeholder="Описание блока"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="editor-row">
+                        <div class="editor-field">
+                            <label>Источник / Организатор</label>
+                            <input type="text" id="blockSourceInput" class="editor-input" placeholder="Например: Большой театр">
+                        </div>
+                    </div>
+                    
+                    <div class="editor-row">
+                        <div class="editor-field">
+                            <label>Цвет блока</label>
+                            <div class="editor-color-picker">
+                                ${['#8b5cf6', '#ec4899', '#f59e0b', '#22c55e', '#06b6d4', '#ef4444', '#6366f1'].map(color => `
+                                    <div class="editor-color-option" data-color="${color}" style="background:${color}" onclick="selectBlockColor('${color}', this)"></div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="editor-row">
+                        <div class="editor-field">
+                            <label>Теги блока (через запятую)</label>
+                            <input type="text" id="blockTagsInput" class="editor-input" placeholder="театр, классика, балет">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="editor-divider"></div>
+                
+                <!-- ВЫБОР СУЩЕСТВУЮЩИХ СОБЫТИЙ -->
+                <div class="editor-section">
+                    <div class="editor-section-header">
+                        <label style="font-weight:600;font-size:14px;">📅 Выберите события для блока</label>
+                        <span style="font-size:12px;color:var(--text-secondary);opacity:0.6;" id="selectedEventsCount">Выбрано: 0</span>
+                    </div>
+                    
+                    <div style="margin-bottom:8px;display:flex;gap:8px;">
+                        <input type="text" id="blockEventSearch" class="editor-input" style="flex:1;" placeholder="Поиск событий..." oninput="filterBlockEvents()">
+                        <button class="editor-add-btn" onclick="selectAllBlockEvents()">Выбрать все</button>
+                        <button class="editor-add-btn" onclick="deselectAllBlockEvents()">Снять все</button>
+                    </div>
+                    
+                    <div id="blockEventsList" style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;">
+                        <!-- Список событий с чекбоксами -->
+                    </div>
+                    <div class="editor-hint">Отметьте события, которые должны войти в этот блок</div>
+                </div>
+            </div>
+            
+            <!-- Кнопки -->
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeBlockEditor()">Отмена</button>
+                ${editingBlockId ? `<button class="btn-delete" onclick="deleteCurrentBlock()" style="margin-right:auto;">🗑️ Удалить блок</button>` : ''}
+                <button class="btn-save" onclick="saveBlock()">Сохранить блок</button>
+            </div>
+        </div>
+    `;
+    return modal;
+}
+
+// ============================================
+// УПРАВЛЕНИЕ СОБЫТИЯМИ В БЛОКЕ
+// ============================================
+
+let blockEventCounter = 0;
+
+function addBlockEventField(title = '', date = '', time = '', description = '') {
+    const container = document.getElementById('blockEventsContainer');
+    const div = document.createElement('div');
+    div.className = 'editor-event-field';
+    div.style.cssText = `
+        padding: 12px;
+        background: var(--background);
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        margin-bottom: 8px;
+    `;
+    div.innerHTML = `
+        <div style="display:flex;gap:8px;margin-bottom:6px;align-items:center;">
+            <input type="text" class="editor-input" style="flex:2;" placeholder="Название события *" value="${title}">
+            <input type="date" class="editor-input" style="flex:1;" placeholder="Дата" value="${date}">
+            <input type="time" class="editor-input" style="flex:0.7;" placeholder="Время" value="${time}">
+            <button class="editor-remove-btn" onclick="this.parentElement.parentElement.remove()">
+                <svg width="20" height="20" viewBox="0 0 288 288">
+                    <path d="M80,80 L208,208" stroke="currentColor" stroke-width="32" fill="none" stroke-linecap="round"/>
+                    <path d="M80,208 L208,80" stroke="currentColor" stroke-width="32" fill="none" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+        <input type="text" class="editor-input" placeholder="Описание события" value="${description}">
+    `;
+    container.appendChild(div);
+    blockEventCounter++;
+}
+
+// ============================================
+// УПРАВЛЕНИЕ СПИСКОМ СОБЫТИЙ В БЛОКЕ
+// ============================================
+
+let selectedBlockEventIds = new Set();
+
+function renderBlockEventsList() {
+    const container = document.getElementById('blockEventsList');
+    if (!container) return;
+    
+    // Берём ВСЕ публичные события (кроме уже входящих в другие блоки)
+    // или все, если редактируем текущий блок
+    let events = calendarEvents.filter(e => e.type === 'public');
+    
+    // Если редактируем блок — показываем все события
+    // Если создаём новый — показываем только свободные события
+    if (!editingBlockId) {
+        // Исключаем события, которые уже в других блоках
+        const eventsInBlocks = new Set();
+        calendarBlocks.forEach(block => {
+            if (block.id !== editingBlockId) {
+                block.events.forEach(e => {
+                    if (e.id) eventsInBlocks.add(e.id);
+                });
+            }
+        });
+        events = events.filter(e => !eventsInBlocks.has(e.id));
+    }
+    
+    if (events.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center;padding:20px;color:var(--text-secondary);opacity:0.5;">
+                Нет доступных публичных событий<br>
+                <small>Сначала создайте события через редактор (⌘E)</small>
+            </div>
+        `;
+        updateSelectedCount();
+        return;
+    }
+    
+    // Сортируем по дате
+    events.sort((a, b) => a.date.localeCompare(b.date));
+    
+    let html = '';
+    events.forEach(event => {
+        const isChecked = selectedBlockEventIds.has(event.id);
+        const dateStr = event.date ? formatDateDisplay(parseDateKey(event.date)) : 'Без даты';
+        
+        html += `
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;margin-bottom:4px;background:${isChecked ? 'var(--primary-bg)' : 'transparent'};border:1px solid ${isChecked ? 'var(--primary)' : 'var(--border)'};transition:all 0.2s ease;">
+                <input type="checkbox" id="blockEvent_${event.id}" 
+                       ${isChecked ? 'checked' : ''} 
+                       onchange="toggleBlockEvent('${event.id}', this.checked)"
+                       style="width:18px;height:18px;cursor:pointer;accent-color:var(--primary);">
+                <label for="blockEvent_${event.id}" style="flex:1;cursor:pointer;display:flex;align-items:center;gap:8px;">
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${event.color || '#6366f1'};flex-shrink:0;"></span>
+                    <span style="font-weight:500;">${escapeHtml(event.title)}</span>
+                    <span style="font-size:12px;color:var(--text-secondary);opacity:0.6;">${dateStr}</span>
+                    ${event.time ? `<span style="font-size:11px;color:var(--text-secondary);opacity:0.4;">${event.time}</span>` : ''}
+                </label>
+                <span style="font-size:10px;color:var(--text-secondary);opacity:0.3;flex-shrink:0;">${event.source || 'публичное'}</span>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    updateSelectedCount();
+}
+
+function toggleBlockEvent(eventId, checked) {
+    if (checked) {
+        selectedBlockEventIds.add(eventId);
+    } else {
+        selectedBlockEventIds.delete(eventId);
+    }
+    updateSelectedCount();
+    // Обновляем стиль строки
+    const container = document.getElementById('blockEventsList');
+    if (container) {
+        const rows = container.querySelectorAll('div[style*="display:flex"]');
+        rows.forEach(row => {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            if (checkbox && checkbox.id === `blockEvent_${eventId}`) {
+                row.style.background = checked ? 'var(--primary-bg)' : 'transparent';
+                row.style.borderColor = checked ? 'var(--primary)' : 'var(--border)';
+            }
+        });
+    }
+}
+
+function updateSelectedCount() {
+    const countEl = document.getElementById('selectedEventsCount');
+    if (countEl) {
+        countEl.textContent = `Выбрано: ${selectedBlockEventIds.size}`;
+    }
+}
+
+function filterBlockEvents() {
+    const search = document.getElementById('blockEventSearch').value.toLowerCase().trim();
+    const container = document.getElementById('blockEventsList');
+    if (!container) return;
+    
+    const rows = container.querySelectorAll('div[style*="display:flex"]');
+    rows.forEach(row => {
+        const label = row.querySelector('label');
+        if (label) {
+            const text = label.textContent.toLowerCase();
+            row.style.display = text.includes(search) ? 'flex' : 'none';
+        }
+    });
+}
+
+function selectAllBlockEvents() {
+    const container = document.getElementById('blockEventsList');
+    if (!container) return;
+    
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+        if (!cb.checked) {
+            cb.checked = true;
+            const eventId = cb.id.replace('blockEvent_', '');
+            selectedBlockEventIds.add(eventId);
+            // Обновляем стиль
+            const row = cb.closest('div[style*="display:flex"]');
+            if (row) {
+                row.style.background = 'var(--primary-bg)';
+                row.style.borderColor = 'var(--primary)';
+            }
+        }
+    });
+    updateSelectedCount();
+}
+
+function deselectAllBlockEvents() {
+    const container = document.getElementById('blockEventsList');
+    if (!container) return;
+    
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+        if (cb.checked) {
+            cb.checked = false;
+            const eventId = cb.id.replace('blockEvent_', '');
+            selectedBlockEventIds.delete(eventId);
+            const row = cb.closest('div[style*="display:flex"]');
+            if (row) {
+                row.style.background = 'transparent';
+                row.style.borderColor = 'var(--border)';
+            }
+        }
+    });
+    updateSelectedCount();
+}
+
+// ============================================
+// ЗАГРУЗКА БЛОКА В РЕДАКТОР
+// ============================================
+
+function loadBlockToEditor(block) {
+    editingBlockId = block.id;
+    document.getElementById('blockEditorTitle').textContent = '✏️ Редактирование блока';
+    document.getElementById('blockTitleInput').value = block.title || '';
+    document.getElementById('blockDescriptionInput').value = block.description || '';
+    document.getElementById('blockSourceInput').value = block.source || '';
+    document.getElementById('blockTagsInput').value = (block.tags || []).join(', ');
+    
+    if (block.color) {
+        selectedBlockColor = block.color;
+        document.querySelectorAll('#blockEditorModal .editor-color-option').forEach(el => {
+            el.classList.toggle('active', el.dataset.color === block.color);
+        });
+    }
+    
+    // Загружаем выбранные события
+    selectedBlockEventIds = new Set();
+    if (block.events && block.events.length > 0) {
+        block.events.forEach(e => {
+            // Находим событие в календаре по ID
+            const event = calendarEvents.find(ev => ev.id === e.id);
+            if (event) {
+                selectedBlockEventIds.add(e.id);
+            }
+        });
+    }
+    
+    renderBlockEventsList();
+}
+
+function clearBlockEditor() {
+    editingBlockId = null;
+    document.getElementById('blockEditorTitle').textContent = '📦 Создание блока событий';
+    document.getElementById('blockTitleInput').value = '';
+    document.getElementById('blockDescriptionInput').value = '';
+    document.getElementById('blockSourceInput').value = '';
+    document.getElementById('blockTagsInput').value = '';
+    document.getElementById('blockEventSearch').value = '';
+    selectedBlockEventIds = new Set();
+    selectedBlockColor = '#8b5cf6';
+    renderBlockEventsList();
+}
+
+let selectedBlockColor = '#8b5cf6';
+
+function selectBlockColor(color, element) {
+    selectedBlockColor = color;
+    document.querySelectorAll('#blockEditorModal .editor-color-option').forEach(el => {
+        el.classList.toggle('active', el.dataset.color === color);
+    });
+}
+
+// ============================================
+// СОХРАНЕНИЕ БЛОКА
+// ============================================
+
+function saveBlock() {
+    const title = document.getElementById('blockTitleInput').value.trim();
+    const description = document.getElementById('blockDescriptionInput').value.trim();
+    const source = document.getElementById('blockSourceInput').value.trim();
+    const tagsInput = document.getElementById('blockTagsInput').value.trim();
+    const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(Boolean) : [];
+    
+    if (!title) {
+        showToast('❌ Введите название блока', true);
+        return;
+    }
+    
+    // Получаем выбранные события
+    const selectedEvents = calendarEvents.filter(e => selectedBlockEventIds.has(e.id));
+    
+    if (selectedEvents.length === 0) {
+        showToast('❌ Выберите хотя бы одно событие для блока', true);
+        return;
+    }
+    
+    // Собираем данные событий для блока (без дублирования)
+    const eventsData = selectedEvents.map(e => ({
+        id: e.id,
+        title: e.title,
+        date: e.date,
+        time: e.time || '',
+        description: e.description || ''
+    }));
+    
+    // Определяем период блока
+    const dates = eventsData.map(e => e.date).sort();
+    const dateStart = dates[0];
+    const dateEnd = dates[dates.length - 1];
+    
+    // Создаём или обновляем блок
+    const blockData = {
+        id: editingBlockId || 'block_' + Date.now(),
+        type: 'block',
+        title: title,
+        description: description,
+        source: source || 'Публичное событие',
+        color: selectedBlockColor || '#8b5cf6',
+        dateStart: dateStart,
+        dateEnd: dateEnd,
+        tags: tags,
+        events: eventsData,  // Сохраняем только ID и основные данные
+        createdAt: new Date().toISOString()
+    };
+    
+    // Сохраняем блок
+    if (editingBlockId) {
+        const index = calendarBlocks.findIndex(b => b.id === editingBlockId);
+        if (index !== -1) {
+            calendarBlocks[index] = blockData;
+            showToast('✅ Блок обновлён');
+        }
+    } else {
+        calendarBlocks.push(blockData);
+        showToast(`✅ Блок "${title}" создан (${eventsData.length} событий)`);
+    }
+    
+    saveBlocks();
+    
+    // Обновляем события: добавляем blockId
+    calendarEvents.forEach(e => {
+        if (selectedBlockEventIds.has(e.id)) {
+            e.blockId = blockData.id;
+            // Наследуем цвет, теги, источник от блока
+            e.color = blockData.color;
+            e.tags = blockData.tags;
+            e.source = blockData.source;
+        }
+    });
+    
+    saveCalendarEvents();
+    renderTimeline();
+    renderMiniCalendar();
+    closeBlockEditor();
+}
+
+// ============================================
+// СОЗДАНИЕ СОБЫТИЙ ИЗ БЛОКА
+// ============================================
+
+function createBlockEvents(block) {
+    // Удаляем старые события этого блока
+    calendarEvents = calendarEvents.filter(e => e.blockId !== block.id);
+    
+    // Создаём новые события
+    block.events.forEach((eventData, index) => {
+        calendarEvents.push({
+            id: `event_${block.id}_${index}`,
+            type: 'public',
+            blockId: block.id,
+            title: eventData.title,
+            date: eventData.date,
+            time: eventData.time || '',
+            description: eventData.description || block.description || '',
+            color: block.color,
+            source: block.source,
+            tags: block.tags || [],
+            content: {
+                images: block.content?.images || [],
+                video: block.content?.video || ''
+            }
+        });
+    });
+    
+    saveCalendarEvents();
+}
+
+function updateBlockEvents(block) {
+    // Удаляем старые события
+    calendarEvents = calendarEvents.filter(e => e.blockId !== block.id);
+    
+    // Создаём новые
+    block.events.forEach((eventData, index) => {
+        calendarEvents.push({
+            id: `event_${block.id}_${index}`,
+            type: 'public',
+            blockId: block.id,
+            title: eventData.title,
+            date: eventData.date,
+            time: eventData.time || '',
+            description: eventData.description || block.description || '',
+            color: block.color,
+            source: block.source,
+            tags: block.tags || [],
+            content: {
+                images: block.content?.images || [],
+                video: block.content?.video || ''
+            }
+        });
+    });
+    
+    saveCalendarEvents();
+}
+
+// ============================================
+// УДАЛЕНИЕ БЛОКА
+// ============================================
+
+function deleteBlock(blockId) {
+    if (!blockId) return;
+    
+    showConfirmDialog(
+        'Удалить блок?',
+        'Все события блока будут удалены из календаря',
+        'Удалить',
+        () => {
+            calendarBlocks = calendarBlocks.filter(b => b.id !== blockId);
+            calendarEvents = calendarEvents.filter(e => e.blockId !== blockId);
+            saveBlocks();
+            saveCalendarEvents();
+            renderTimeline();
+            renderMiniCalendar();
+            showToast('🗑️ Блок удалён');
+        }
+    );
+}
+
+// ============================================
+// ХРАНЕНИЕ БЛОКОВ
+// ============================================
+
+let calendarBlocks = [];
+
+function loadBlocks() {
+    const saved = localStorage.getItem('calendar_blocks');
+    if (saved) {
+        try {
+            calendarBlocks = JSON.parse(saved);
+        } catch (e) {
+            calendarBlocks = [];
+        }
+    } else {
+        calendarBlocks = [];
+    }
+}
+
+function saveBlocks() {
+    localStorage.setItem('calendar_blocks', JSON.stringify(calendarBlocks));
+}
+
+// ============================================
+// ЗАКРЫТИЕ РЕДАКТОРА БЛОКОВ
+// ============================================
+
+function closeBlockEditor() {
+    const modal = document.getElementById('blockEditorModal');
+    if (modal) modal.classList.remove('visible');
+    document.body.style.overflow = '';
+}
+
+// ============================================
+// ЭКСПОРТ
+// ============================================
+
+window.openBlockEditor = openBlockEditor;
+window.closeBlockEditor = closeBlockEditor;
+window.addBlockEventField = addBlockEventField;
+window.saveBlock = saveBlock;
+window.deleteBlock = deleteBlock;
+window.loadBlocks = loadBlocks;
+window.saveBlocks = saveBlocks;
+window.selectBlockColor = selectBlockColor;
