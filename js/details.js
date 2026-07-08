@@ -40,6 +40,18 @@ function showEventDetails(eventId) {
     const isPublic = event.type === 'public';
     const isAdmin = localStorage.getItem('calendar_admin_mode') === 'true';
 
+    const fab = document.querySelector('.fab');
+        const headerBtn = document.getElementById('headerAddBtn');
+        
+        if (fab) {
+            fab.style.display = 'none';  // Скрываем FAB
+            fab.style.opacity = '0';
+            fab.style.pointerEvents = 'none';
+        }
+        if (headerBtn) {
+            headerBtn.style.display = 'flex';  // Показываем кнопку в хедере
+        }
+
     // Показываем детали
     document.getElementById('emptyState').style.display = 'none';
     document.getElementById('eventDetails').style.display = 'flex';
@@ -97,7 +109,7 @@ function showEventDetails(eventId) {
         const titleWrap = document.querySelector('.details-title-wrap');
         const badge = document.createElement('span');
         badge.className = 'public-badge';
-        badge.textContent = '📌 Публичное';
+        badge.textContent = 'Публичное';
         titleWrap.appendChild(badge);
     }
 
@@ -111,12 +123,9 @@ function showEventDetails(eventId) {
             // ✅ АДМИН: может редактировать и удалять
             editBtn.style.display = 'flex';
             deleteBtn.style.display = 'flex';
-            deleteBtn.textContent = '🗑️ Удалить';
+            deleteBtn.textContent = 'Удалить';
             editBtn.innerHTML = `
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 20h9"/>
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                </svg>
+
                 Редактировать
             `;
             editBtn.title = 'Редактировать публичное событие (админ)';
@@ -124,18 +133,15 @@ function showEventDetails(eventId) {
             // ❌ ПОЛЬЗОВАТЕЛЬ: только удаление
             editBtn.style.display = 'none';
             deleteBtn.style.display = 'flex';
-            deleteBtn.textContent = '🗑️ Удалить';
+            deleteBtn.textContent = 'Удалить';
         }
     } else {
         // ======= ЛИЧНОЕ СОБЫТИЕ =======
         editBtn.style.display = 'flex';
         deleteBtn.style.display = 'flex';
-        deleteBtn.textContent = '🗑️ Удалить';
+        deleteBtn.textContent = 'Удалить';
         editBtn.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 20h9"/>
-                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
+
             Редактировать
         `;
         editBtn.title = 'Редактировать событие';
@@ -156,10 +162,20 @@ function closeDetails() {
     document.getElementById('emptyState').style.display = 'flex';
     currentDetailEventId = null;
 
+    // ============================================
+    // ВОССТАНАВЛИВАЕМ FAB И КНОПКУ В ХЕДЕРЕ
+    // ============================================
     const fab = document.querySelector('.fab');
     const headerBtn = document.getElementById('headerAddBtn');
-    if (fab) fab.style.display = 'flex';
-    if (headerBtn) headerBtn.style.display = 'none';
+    
+    if (fab) {
+        fab.style.display = 'flex';
+        fab.style.opacity = '1';
+        fab.style.pointerEvents = 'auto';
+    }
+    if (headerBtn) {
+        headerBtn.style.display = 'none';
+    }
 
     document.querySelectorAll('.timeline-event').forEach(el => {
         el.style.cursor = 'pointer';
