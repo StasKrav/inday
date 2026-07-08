@@ -8,22 +8,17 @@
 
 const ADMIN_MODE = localStorage.getItem('calendar_admin_mode') === 'true';
 
-// Функция для входа в админ-режим
 function enableAdminMode(password) {
-    if (password === 'ваш_пароль') { // Замените на свой пароль
+    // Пароль скрыт в коде, без подсказок
+    if (password === '>&Vj+ydFA$k#NZNt<') {  // ← СВОЙ ПАРОЛЬ
         localStorage.setItem('calendar_admin_mode', 'true');
-        ADMIN_MODE = true;
-        showToast('✅ Админ-режим включен');
         return true;
     }
-    showToast('❌ Неверный пароль', true);
     return false;
 }
 
 function disableAdminMode() {
     localStorage.removeItem('calendar_admin_mode');
-    ADMIN_MODE = false;
-    showToast('👋 Админ-режим выключен');
 }
 
 
@@ -53,7 +48,7 @@ function openPublicEventEditor(eventId = null) {
         const event = calendarEvents.find(e => e.id === eventId);
         if (event && isPublicEvent(event)) {
             loadEventToEditor(event);
-            document.getElementById('editorTitle').textContent = '✏️ Редактирование публичного события';
+            document.getElementById('editorTitle').textContent = 'Редактирование публичного события';
         } else {
             showToast('❌ Событие не найдено или не является публичным', true);
             return;

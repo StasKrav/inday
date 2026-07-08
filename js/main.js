@@ -167,27 +167,82 @@ function toggleAdminMode() {
 }
 
 function showAdminLoginModal() {
-    document.getElementById('adminLoginModal').classList.add('visible');
+    const modal = document.getElementById('adminLoginModal');
+    if (!modal) {
+        // Если модалки нет — создаём её скрыто
+        createAdminLoginModal();
+        return;
+    }
+    modal.classList.add('visible');
     setTimeout(() => {
-        document.getElementById('adminPasswordInput').focus();
+        const input = document.getElementById('adminPasswordInput');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
     }, 100);
+}
+
+function createAdminLoginModal() {
+    // Минималистичная модалка без намёков на админку
+    const modal = document.createElement('div');
+    modal.id = 'adminLoginModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 360px;">
+            <div class="modal-header">
+                <h3 style="font-size:16px;">🔐 Доступ</h3>
+                <button class="modal-close" onclick="closeAdminLoginModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="field">
+                    <label>Код доступа</label>
+                    <input type="password" class="field-input" id="adminPasswordInput" 
+                           placeholder="Введите код..." 
+                           onkeydown="if(event.key==='Enter') tryAdminLogin()">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeAdminLoginModal()">Отмена</button>
+                <button class="btn-save" onclick="tryAdminLogin()">Войти</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
 }
 
 function closeAdminLoginModal() {
     document.getElementById('adminLoginModal').classList.remove('visible');
 }
 
+// ============================================
+// ВХОД В АДМИН-РЕЖИМ (БЕЗ ПОДСКАЗОК)
+// ============================================
+
 function tryAdminLogin() {
-    const password = document.getElementById('adminPasswordInput').value;
-    // Замените 'your_secret_password' на свой пароль
-    if (password === 'stas321') {
+    const password = document.getElementById('adminPasswordInput')?.value || '';
+    
+    // ПРОВЕРКА БЕЗ ПОДСКАЗОК
+    if (password === 'Inday2024@Secure!') {  // ← СВОЙ ПАРОЛЬ
         localStorage.setItem('calendar_admin_mode', 'true');
         closeAdminLoginModal();
-        showToast('✅ Админ-режим включен');
-        location.reload();
+        
+        // Открываем редактор без лишних сообщений
+        setTimeout(() => {
+            if (typeof openPublicEventEditor === 'function') {
+                openPublicEventEditor();
+            }
+        }, 300);
     } else {
-        showToast('❌ Неверный пароль', true);
-        document.getElementById('adminPasswordInput').value = '';
-        document.getElementById('adminPasswordInput').focus();
+        // ❌ НЕВЕРНЫЙ ПАРОЛЬ — просто очищаем поле без подсказок
+        const input = document.getElementById('adminPasswordInput');
+        if (input) {
+            input.value = '';
+            input.focus();
+            input.style.borderColor = '#ef4444';
+            setTimeout(() => {
+                input.style.borderColor = '';
+            }, 500);
+        }
     }
 }
