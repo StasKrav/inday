@@ -84,6 +84,12 @@
       </div>
 
       <div class="app-bar-right">
+      	<!-- Рядом с кнопкой темы -->
+      	<button class="icon-button" onclick="toggleAdminMode()" title="Админ-режим">
+      	    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      	        <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z"/>
+      	    </svg>
+      	</button>
           <!-- Кнопка темы -->
           <button class="icon-button" onclick="toggleTheme()" title="Переключить тему">
               <svg id="themeIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -635,6 +641,26 @@
       </svg>
     </button>
 
+<!-- Модалка входа в админ-режим -->
+<div class="modal" id="adminLoginModal">
+    <div class="modal-content" style="max-width: 360px;">
+        <div class="modal-header">
+            <h3 style="font-size:16px;">🔐 Вход в админ-режим</h3>
+            <button class="modal-close" onclick="closeAdminLoginModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="field">
+                <label>Пароль администратора</label>
+                <input type="password" class="field-input" id="adminPasswordInput" 
+                       placeholder="Введите пароль..." onkeydown="if(event.key==='Enter') tryAdminLogin()">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeAdminLoginModal()">Отмена</button>
+            <button class="btn-save" onclick="tryAdminLogin()">Войти</button>
+        </div>
+    </div>
+</div>
 
 
 
@@ -654,7 +680,7 @@
     <!-- 2. МОДУЛИ (с зависимостями от утилит) -->
     <script src="js/selection.js"></script>
     <script src="js/hamburger.js"></script>
-    <script src="js/widgets.js"></script>
+    <!-- <script src="js/widgets.js"></script> -->
     <script src="js/tag.js"></script>
     <script src="js/details.js"></script>
     <script src="js/core/timeline.js"></script>

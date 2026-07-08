@@ -6,8 +6,41 @@
 // ОТКРЫТИЕ РЕДАКТОРА
 // ============================================
 
+const ADMIN_MODE = localStorage.getItem('calendar_admin_mode') === 'true';
+
+// Функция для входа в админ-режим
+function enableAdminMode(password) {
+    if (password === 'ваш_пароль') { // Замените на свой пароль
+        localStorage.setItem('calendar_admin_mode', 'true');
+        ADMIN_MODE = true;
+        showToast('✅ Админ-режим включен');
+        return true;
+    }
+    showToast('❌ Неверный пароль', true);
+    return false;
+}
+
+function disableAdminMode() {
+    localStorage.removeItem('calendar_admin_mode');
+    ADMIN_MODE = false;
+    showToast('👋 Админ-режим выключен');
+}
+
+
+// ============================================
+// ОТКРЫТИЕ РЕДАКТОРА (ТОЛЬКО ДЛЯ АДМИНА)
+// ============================================
+
 function openPublicEventEditor(eventId = null) {
-    // Создаем модалку редактора
+    // Проверяем админ-режим
+    const isAdmin = localStorage.getItem('calendar_admin_mode') === 'true';
+    
+    if (!isAdmin) {
+        showAdminLoginModal();
+        return;
+    }
+    
+    // Админ-режим включён
     let modal = document.getElementById('publicEditorModal');
     
     if (!modal) {
@@ -20,13 +53,26 @@ function openPublicEventEditor(eventId = null) {
         const event = calendarEvents.find(e => e.id === eventId);
         if (event && isPublicEvent(event)) {
             loadEventToEditor(event);
+            document.getElementById('editorTitle').textContent = '✏️ Редактирование публичного события';
+        } else {
+            showToast('❌ Событие не найдено или не является публичным', true);
+            return;
         }
     } else {
+        // Новое событие
         clearEditor();
+        document.getElementById('editorTitle').textContent = '📌 Создание публичного события';
     }
     
     modal.classList.add('visible');
     document.body.style.overflow = 'hidden';
+}
+
+
+function closeAdminLoginModal() {
+    const modal = document.getElementById('adminLoginModal');
+    if (modal) modal.classList.remove('visible');
+    document.getElementById('adminPasswordInput').value = '';
 }
 
 function closePublicEventEditor() {
@@ -472,7 +518,6 @@ function addAdField(title = '', description = '', image = '', link = '', buttonT
 function loadEventToEditor(event) {
     editingPublicEventId = event.id;
     
-    document.getElementById('editorTitle').textContent = 'Редактирование события';
     document.getElementById('editorTitleInput').value = event.title || '';
     document.getElementById('editorDateInput').value = event.date || '';
     document.getElementById('editorTimeInput').value = event.time || '';
@@ -556,17 +601,15 @@ function savePublicEvent() {
     const address = document.getElementById('editorAddressInput').value.trim();
     const metro = document.getElementById('editorMetroInput').value.trim();
     const description = document.getElementById('editorDescriptionInput').value.trim();
-    
-    // ✅ ОДНО ОБЪЯВЛЕНИЕ video
     let video = document.getElementById('editorVideoInput').value.trim();
     
     // Валидация
     if (!title) {
-        showToast('Введите название события', true);
+        showToast('❌ Введите название события', true);
         return;
     }
     if (!date) {
-        showToast('Выберите дату', true);
+        showToast('❌ Выберите дату', true);
         return;
     }
     
@@ -576,11 +619,9 @@ function savePublicEvent() {
         if (input.value.trim()) images.push(input.value.trim());
     });
     
-    // Собираем дополнительные видео (если есть)
+    // Собираем дополнительные видео
     document.querySelectorAll('#editorVideoContainer .editor-video-field input[type="text"]').forEach(input => {
         if (input.value.trim() && input.id !== 'editorVideoInput') {
-            // Можно сохранить как дополнительное видео
-            // или добавить к основному через запятую
             if (video) video += ',';
             video += input.value.trim();
         }
@@ -615,7 +656,7 @@ function savePublicEvent() {
         }
     });
     
-    // Создаем объект события
+    // Создаём объект события
     const eventData = {
         id: editingPublicEventId || 'pub_' + Date.now(),
         title: title,
@@ -641,8 +682,14 @@ function savePublicEvent() {
     if (editingPublicEventId) {
         const index = calendarEvents.findIndex(e => e.id === editingPublicEventId);
         if (index !== -1) {
+            // Сохраняем старый ID
+            eventData.id = editingPublicEventId;
             calendarEvents[index] = { ...calendarEvents[index], ...eventData };
-            showToast('✅ Событие обновлено');
+            showToast('✅ Публичное событие обновлено');
+        } else {
+            // Если ID не найден — создаём новое
+            calendarEvents.push(eventData);
+            showToast('✅ Публичное событие создано');
         }
     } else {
         calendarEvents.push(eventData);

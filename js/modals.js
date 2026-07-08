@@ -162,22 +162,24 @@ function saveEvent() {
 }
 
 function deleteEvent(eventId) {
-  const id = typeof eventId === "string" ? parseFloat(eventId) : eventId;
-  const event = calendarEvents.find((e) => e.id === id);
-  if (!event) return;
+    // ✅ Сравниваем как строки
+    const event = calendarEvents.find(e => String(e.id) === String(eventId));
+    if (!event) return;
 
-  showConfirmDialog(
-    "Удалить событие?",
-    `Удалить "${event.title}"?`,
-    "Удалить",
-    () => {
-      calendarEvents = calendarEvents.filter((e) => e.id !== id);
-      saveCalendarEvents();
-      renderMiniCalendar();
-      renderTimeline();
-      if (currentDetailEventId === id) closeDetails();
-    },
-  );
+    showConfirmDialog(
+        "Удалить событие?",
+        `Удалить "${event.title}"?`,
+        "Удалить",
+        () => {
+            calendarEvents = calendarEvents.filter(e => String(e.id) !== String(eventId));
+            saveCalendarEvents();
+            renderMiniCalendar();
+            renderTimeline();
+            if (currentDetailEventId && String(currentDetailEventId) === String(eventId)) {
+                closeDetails();
+            }
+        },
+    );
 }
 
 function viewEvent(eventId) {

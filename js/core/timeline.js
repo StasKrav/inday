@@ -172,14 +172,26 @@ function renderAllEvents(events) {
 
 function handleEventClick(eventId, element) {
     const id = typeof eventId === 'string' ? eventId : String(eventId);
+    console.log('🖱️ Клик по событию:', id);
     
+    // Если режим выбора включён — выбираем событие
     if (typeof isSelectMode === 'function' && isSelectMode()) {
         if (typeof selectEvent === 'function') {
             selectEvent(id, element);
         }
+        return;
+    }
+    
+    // ✅ ВСЕГДА открываем детали
+    if (typeof showEventDetails === 'function') {
+        console.log('📌 Открываем детали для:', id);
+        showEventDetails(id);
     } else {
-        if (typeof showEventDetails === 'function') {
-            showEventDetails(id);
+        console.warn('⚠️ showEventDetails не найдена');
+        // fallback
+        const event = calendarEvents.find(e => e.id == id);
+        if (event && typeof renderEventDetails === 'function') {
+            renderEventDetails(event);
         }
     }
 }
